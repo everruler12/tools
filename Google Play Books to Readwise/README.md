@@ -7,7 +7,8 @@
 3. Change PDF to HTML in the dropdown selection, then email to yourself.
 4. Download the HTML file and open it in your browser
 5. Open DevTools Console (F12) then copy/paste the code below and run it. This will download the CSV file to your computer.
-```function downloadCSV(text, filename) {
+```javascript
+function downloadCSV(text, filename) {
     let a = $('<a>', {
         'href': 'data:text/csv;charset=utf-8,' + encodeURIComponent(text),
         'download': filename,
@@ -67,5 +68,5 @@ function init() {
 
     downloadCSV(Papa.unparse(data), `${title}.csv`)
 }
-
+```
 5. Import that CSV file into Readwise at https://readwise.io/import_bulk
