@@ -66,6 +66,6 @@ function init() {
     }).filter(el => el !== undefined) // remove first two
 
     downloadCSV(Papa.unparse(data), `${title}.csv`)
-
 }```
+
 5. Import that CSV file into Readwise at https://readwise.io/import_bulk
