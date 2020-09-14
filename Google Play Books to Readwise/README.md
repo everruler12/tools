@@ -5,6 +5,67 @@
 1. [Sync notes from Play Books to Google Drive](https://www.cnet.com/how-to/sync-notes-from-play-books-to-google-drive/)
 2. In the Google Doc of synced notes, File → Email → Email as attachment
 3. Change PDF to HTML in the dropdown selection, then email to yourself.
-4. Download the HTML file, open in browser, then copy the code below into your browser URL and press Enter. This will download the CSV file to your computer.
- ```javascript:var%20%24jscomp%3D%24jscomp%7C%7C%7B%7D%3B%24jscomp.scope%3D%7B%7D%3B%24jscomp.createTemplateTagFirstArg%3Dfunction(a)%7Breturn%20a.raw%3Da%7D%3B%24jscomp.createTemplateTagFirstArgWithRaw%3Dfunction(a%2Cb)%7Ba.raw%3Db%3Breturn%20a%7D%3Bfunction%20downloadCSV(a%2Cb)%7Bvar%20c%3D%24(%22%3Ca%3E%22%2C%7Bhref%3A%22data%3Atext%2Fcsv%3Bcharset%3Dutf-8%2C%22%2BencodeURIComponent(a)%2Cdownload%3Ab%2Cstyle%3A%22display%3Anone%3B%22%7D).appendTo(%22body%22)%3Bc%5B0%5D.click()%3Bc.remove()%7Dfunction%20appendScript(a)%7Bvar%20b%3Ddocument.createElement(%22script%22)%3Bb.src%3Da%3Bdocument.head.appendChild(b)%7DappendScript(%22https%3A%2F%2Fcdnjs.cloudflare.com%2Fajax%2Flibs%2Fjquery%2F3.5.1%2Fjquery.min.js%22)%3BappendScript(%22https%3A%2F%2Fcdnjs.cloudflare.com%2Fajax%2Flibs%2FPapaParse%2F5.3.0%2Fpapaparse.min.js%22)%3BsetTimeout(init%2C500)%3Bfunction%20init()%7Bvar%20a%3D%24(%22body%22).children(%22table%22)%2Cb%3Da.eq(0).find(%22td%22).eq(1).find(%22h1%22).text().trim()%2Cc%3Da.eq(0).find(%22td%22).eq(1).find(%22p%22).eq(0).text().trim()%3Ba%3DArray.from(a).map(function(d%2Ce)%7Bel%3D%24(d).find(%22table%22)%3Bif(0!%3D%3De%26%261!%3D%3De)%7Bvar%20g%3D%24(d).prevAll(%22h2%22).eq(0).text().trim()%2Ch%3Del.find(%22td%22).eq(1).find(%22p%22).eq(0).text().trim()%2Cf%3Del.find(%22td%22).eq(2).find(%22a%22)%2Ck%3Df.text().trim()%3Bf.attr(%22href%22)%3Breturn%7BHighlight%3Ah%2CTitle%3Ab%2CAuthor%3Ac%2CNote%3Ag%2CLocation%3Ak%7D%7D%7D).filter(function(d)%7Breturn%20void%200!%3D%3Dd%7D)%3BdownloadCSV(Papa.unparse(a)%2Cb%2B%22.csv%22)%7D%3Bvoid+0)```
+4. Download the HTML file and open it in your browser
+5. Open DevTools Console (F12) then copy/paste the code below and run it. This will download the CSV file to your computer.
+ ```function downloadCSV(text, filename) {
+    let a = $('<a>', {
+        'href': 'data:text/csv;charset=utf-8,' + encodeURIComponent(text),
+        'download': filename,
+        'style': 'display:none;'
+    }).appendTo('body')
+    a[0].click()
+    a.remove()
+}
+
+function appendScript(url) {
+    let s = document.createElement('script')
+    s.src = url
+    document.head.appendChild(s)
+}
+
+appendScript("https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js")
+appendScript("https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js")
+
+setTimeout(init, 500)
+
+function init() {
+    var tables = $('body').children('table')
+
+    var title = tables.eq(0).find('td').eq(1).find('h1').text().trim()
+    var author = tables.eq(0).find('td').eq(1).find('p').eq(0).text().trim()
+
+    var data = Array.from(tables).map((_el, i) => {
+        el = $(_el).find('table')
+
+        if (i === 0) {
+            // const td = el.find('td').eq(1)
+            // title = td.find('h1').text().trim()
+            // author = td.find('p').eq(0).text().trim()
+            return
+        } else if (i === 1) {
+            // This document is overwritten when you make changes in Play Books. 
+            // You should make a copy of this document before you edit it.
+            return
+        } else {
+
+            var chapter = $(_el).prevAll('h2').eq(0).text().trim()
+            var highlight = el.find('td').eq(1).find('p').eq(0).text().trim()
+            var page = el.find('td').eq(2).find('a')
+            var page_number = page.text().trim()
+            var page_link = page.attr('href')
+
+            return {
+                "Highlight": highlight,
+                "Title": title,
+                "Author": author,
+                // "URL": page_link,
+                "Note": chapter,
+                "Location": page_number
+            }
+        }
+    }).filter(el => el !== undefined) // remove first two
+
+    downloadCSV(Papa.unparse(data), `${title}.csv`)
+
+}```
 5. Import that CSV file into Readwise at https://readwise.io/import_bulk
