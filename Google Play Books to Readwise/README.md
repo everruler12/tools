@@ -4,8 +4,8 @@
 
 1. [Sync notes from Play Books to Google Drive](https://www.cnet.com/how-to/sync-notes-from-play-books-to-google-drive/)
 2. In the Google Doc of synced notes, File → Email → Email as attachment
-3. Change PDF to HTML in the dropdown selection, then email to yourself.
-4. Download the HTML file and open it in your browser
+3. In the dropdown selection, change PDF to HTML, then email to yourself.
+4. Download the HTML file and open it in your browser.
 5. Open DevTools Console (F12) then copy/paste the code below and run it. This will download the CSV file to your computer.
 ```javascript
 function downloadCSV(text, filename) {
@@ -59,7 +59,7 @@ function init() {
                 "Highlight": highlight,
                 "Title": title,
                 "Author": author,
-                // "URL": page_link,
+                // "URL": page_link, // this will cause each highlight to be treated as a different article, so not included
                 "Note": chapter,
                 "Location": page_number
             }
