@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erik's Bookmarklets</title>
+</head>
+<body>
+    <h1>Erik's Bookmarklets</h1>
+    <p>Instructions: Drag the link to your bookmarks bar</p>
+    <h2>Copy Title & Url</h2>
+    <h3><a href="javascript:(function()%7B(function()%20%7B%0A%20%20%20%20const%20url%20%3D%20document.URL%0A%20%20%20%20const%20title%20%3D%20document.title%0A%20%20%20%20copyLink(url%2C%20title)%0A%0A%20%20%20%20function%20copyLink(url%2C%20title)%20%7B%0A%20%20%20%20%20%20%20%20%2F%2F%20append%20link%0A%20%20%20%20%20%20%20%20const%20targetId%20%3D%20%22_hiddenCopyTextarea_%22%0A%20%20%20%20%20%20%20%20var%20target%20%3D%20document.createElement('a')%0A%20%20%20%20%20%20%20%20target.style.position%20%3D%20%22absolute%22%0A%20%20%20%20%20%20%20%20target.style.left%20%3D%20%22-9999px%22%0A%20%20%20%20%20%20%20%20target.style.top%20%3D%20%220%22%0A%20%20%20%20%20%20%20%20target.id%20%3D%20targetId%0A%20%20%20%20%20%20%20%20target.href%20%3D%20url%0A%20%20%20%20%20%20%20%20target.textContent%20%3D%20title%0A%20%20%20%20%20%20%20%20document.body.appendChild(target)%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20get%20link%20data%3B%20https%3A%2F%2Fstackoverflow.com%2Fquestions%2F53003980%2Fhow-to-copy-a-hypertext-link-into-clipboard-with-javascript-and-preserve-its-lin%0A%20%20%20%20%20%20%20%20const%20link%20%3D%20document.getElementById(targetId)%20%2F%2F%20shorten%20to%20target%3F%20needs%20appended%3F%0A%20%20%20%20%20%20%20%20const%20range%20%3D%20document.createRange()%0A%20%20%20%20%20%20%20%20range.selectNode(link)%0A%20%20%20%20%20%20%20%20const%20selection%20%3D%20window.getSelection()%0A%20%20%20%20%20%20%20%20selection.removeAllRanges()%0A%20%20%20%20%20%20%20%20selection.addRange(range)%0A%0A%20%20%20%20%20%20%20%20%2F%2F%20copy%0A%20%20%20%20%20%20%20%20try%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20document.execCommand(%22copy%22)%0A%20%20%20%20%20%20%20%20%20%20%20%20console.log(%22Copied%3A%20%5Cn%22%2C%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20title%2C%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20%20url%0A%20%20%20%20%20%20%20%20%20%20%20%20%7D)%0A%20%20%20%20%20%20%20%20%20%20%20%20document.getElementById(targetId).remove()%20%2F%2F%20shorten%20to%20target%3F%0A%20%20%20%20%20%20%20%20%7D%20catch%20(e)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20console.log(%22Copy%20failed.%22)%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%7D)()%7D)()%3B">Copy Title & Url</a></h3>
+    <p>Description: Copies a webpage's title and URL for paste into note-taking app or Circle.</p>
+</body>
+</html>
