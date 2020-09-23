@@ -1,1 +1,39 @@
-hi
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Erik's Tools</title>
+    <link rel="stylesheet" href="bulma.min.css">
+    <style>
+        .bookmarklets a {
+            cursor: move;
+        }
+    </style>
+</head>
+
+<body>
+    <section class="section">
+        <div class="container bookmarklets">
+            <h1 class="title">Bookmarklets</h1>
+            <p>
+                <a class="button" href="javascript:(function()%7B(function()%20%7B%0A%20%20%20%20if%20(window.jQuery)%20%7B%0A%20%20%20%20%20%20%20%20console.log(%60jQuerify%3A%20Already%20loaded%60)%0A%20%20%20%20%20%20%20%20return%0A%20%20%20%20%7D%0A%0A%20%20%20%20let%20s%20%3D%20document.createElement('script')%0A%20%20%20%20s.src%20%3D%20%22https%3A%2F%2Fcdnjs.cloudflare.com%2Fajax%2Flibs%2Fjquery%2F3.5.1%2Fjquery.min.js%22%0A%20%20%20%20document.head.appendChild(s)%0A%0A%20%20%20%20let%20counter%20%3D%200%0A%20%20%20%20let%20timeoutLength%20%3D%205%0A%20%20%20%20let%20timeoutLimit%20%3D%201000%0A%0A%20%20%20%20waitForLoad()%0A%0A%20%20%20%20function%20waitForLoad()%20%7B%0A%20%20%20%20%20%20%20%20if%20(counter%20*%20timeoutLength%20%3E%3D%20timeoutLimit)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20console.log(%60jQuerify%3A%20Timed-out%20after%20%24%7BtimeoutLimit%7D%20ms%60)%0A%20%20%20%20%20%20%20%20%20%20%20%20alert('Error%3A%20jQuery%20not%20loaded.')%0A%20%20%20%20%20%20%20%20%20%20%20%20return%0A%20%20%20%20%20%20%20%20%7D%20else%20if%20(window.jQuery)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20console.log(%60jQuerify%3A%20Loaded%20after%20%24%7Bcounter%20*%20timeoutLength%7D%20ms%60)%0A%20%20%20%20%20%20%20%20%7D%20else%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20counter%2B%2B%0A%20%20%20%20%20%20%20%20%20%20%20%20setTimeout(waitForLoad%2C%20timeoutLength)%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%0A%7D)()%7D)()%3B">jQuerify</a>
+                <span>Adds jQuery to the webpage. Useful for testing things in DevTools console.</span>
+            </p>
+            <br>
+            <p>
+                <a class="button" href="javascript:(function()%7B(function()%20%7B%0A%20%20%20%20function%20getURL()%20%7B%0A%20%20%20%20%20%20%20%20return%20document.URL%0A%20%20%20%20%7D%0A%0A%20%20%20%20function%20getTitle(url)%20%7B%0A%20%20%20%20%20%20%20%20if%20(url.indexOf('mail.google.com')%20!%3D%3D%20-1)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20return%20document.title.replace(%2F%20-%20.*%3F%40gmail%5C.com%20-%20Gmail%24%2F%2C%20'%20-%20Gmail')%0A%20%20%20%20%20%20%20%20%7D%20else%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20return%20document.title%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%0A%20%20%20%20const%20url%20%3D%20getURL()%0A%20%20%20%20const%20title%20%3D%20getTitle(url)%0A%0A%20%20%20%20copyLink(url%2C%20title)%0A%0A%20%20%20%20function%20copyLink(url%2C%20title)%20%7B%0A%20%20%20%20%20%20%20%20function%20listener(e)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20e.clipboardData.setData(%22text%2Fplain%22%2C%20title%20%2B%20'%5Cn'%20%2B%20url)%0A%20%20%20%20%20%20%20%20%20%20%20%20e.clipboardData.setData(%22text%2Fhtml%22%2C%20%60%3Ca%20href%3D%22%24%7Burl%7D%22%3E%24%7Btitle%7D%3C%2Fa%3E%60)%0A%20%20%20%20%20%20%20%20%20%20%20%20e.preventDefault()%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%20%20%20%20document.addEventListener(%22copy%22%2C%20listener)%0A%20%20%20%20%20%20%20%20document.execCommand(%22copy%22)%0A%20%20%20%20%20%20%20%20document.removeEventListener(%22copy%22%2C%20listener)%0A%20%20%20%20%7D%0A%7D)()%7D)()%3B">Copy Title & Url</a>
+                <span>Copies a webpage's title and URL. Will be pasted as a link if supported in app, or else as plain text.</span>
+            </p>
+        </div>
+    </section>
+
+
+    <script>
+        $('.bookmarklets').find('a').click(() => false) // don't do anything when clicked
+    </script>
+
+</body>
+
+</html>
