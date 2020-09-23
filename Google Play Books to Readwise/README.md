@@ -6,7 +6,7 @@
 2. In the Google Doc of synced notes, File → Email → Email as attachment (or download File → Download → Web Page (.html, zipped) )
 3. In the dropdown selection, change PDF to HTML, then email to yourself (or download the .zip and unzip it).
 4. Download the HTML file and open it in your browser.
-5. Open DevTools Console (F12) then copy/paste the code below and run it. This will download the CSV file to your computer.
+5. Open DevTools Console (F12) then copy/paste the code below and press Enter. This will download the CSV file to your computer.
 ```javascript
 // tested with https://docs.google.com/document/d/1xooNMkC3zezRZWeRyxZoAyhdnito25NJSgSO5EtSevs/edit
 
