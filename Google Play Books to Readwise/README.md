@@ -93,3 +93,6 @@ function downloadCSV(text, filename) {
 }
 ```
 5. Import that CSV file into Readwise at https://readwise.io/import_bulk
+
+    - Note: If you mess up an import, delete it, and try to import again, Readwise will show an error. I think the deleted highlights are still in the system, and the book title conflicts. If you change the book title in the .csv, it will work again.
+    - Note: I don't know how to get the Table of Contents structure to keep the order of highlights under that chapter. It seems to add the chapters, and then all the highlights under the last chapter.
