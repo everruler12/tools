@@ -1,3 +1,4 @@
+;
 (function() {
     waitForLoad({
         name: 'jQuery',
@@ -18,7 +19,7 @@
         waitForLoad({
             name: 'Rangyinputs (jQuery plugin)',
             load() {
-                appendFile("https://rawgit.com/timdown/rangyinputs/master/rangyinputs-jquery-src.js") // https://github.com/timdown/rangyinputs
+                appendFile("https://tools.eriknewhard.com/roam-js/assets/rangyinputs-jquery-src.js") // from https://github.com/timdown/rangyinputs
             },
             timeoutStep: 50,
             timeoutLimit: 2000,
@@ -97,4 +98,4 @@
             }
         }
     }
-})()
+})();
