@@ -23,12 +23,12 @@
 </head>
 
 <body>
-    <section id="vm-app" class="section">
+    <section id="vm-app-bookmarklets" class="section">
         <div class="container">
             <h1 class="title">Bookmarklets</h1>
             <p>Instructions: Drag the button to your bookmarks bar. The bookmarklet will run the script on the active page when clicked.</p>
             <p class="bookmarklet" v-for="bm in bookmarklets">
-                <a class="button bookmarklet" :href="bm.url" onclick="return false;">{{bm.name}}</a>
+                <a class="button bookmarklet" :href="bm.url" @click.prevent>{{bm.name}}</a>
                 <span>{{bm.description}}</span>
             </p>
         </div>
@@ -37,22 +37,22 @@
 
     <script>
         var vm = new Vue({
-            el: "#vm-app",
+            el: "#vm-app-bookmarklets",
             data: {
                 bookmarklets: [{
                     "name": "jQuerify",
-                    "code": "javascript:(function()%7B(function()%20%7B%0A%20%20%20%20if%20(window.jQuery)%20%7B%0A%20%20%20%20%20%20%20%20console.log(%60jQuerify%3A%20Already%20loaded%60)%0A%20%20%20%20%20%20%20%20return%0A%20%20%20%20%7D%0A%0A%20%20%20%20let%20s%20%3D%20document.createElement('script')%0A%20%20%20%20s.src%20%3D%20%22https%3A%2F%2Fcdnjs.cloudflare.com%2Fajax%2Flibs%2Fjquery%2F3.5.1%2Fjquery.min.js%22%0A%20%20%20%20document.head.appendChild(s)%0A%0A%20%20%20%20let%20counter%20%3D%200%0A%20%20%20%20let%20timeoutLength%20%3D%205%0A%20%20%20%20let%20timeoutLimit%20%3D%201000%0A%0A%20%20%20%20waitForLoad()%0A%0A%20%20%20%20function%20waitForLoad()%20%7B%0A%20%20%20%20%20%20%20%20if%20(counter%20*%20timeoutLength%20%3E%3D%20timeoutLimit)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20console.log(%60jQuerify%3A%20Timed-out%20after%20%24%7BtimeoutLimit%7D%20ms%60)%0A%20%20%20%20%20%20%20%20%20%20%20%20alert('Error%3A%20jQuery%20not%20loaded.')%0A%20%20%20%20%20%20%20%20%20%20%20%20return%0A%20%20%20%20%20%20%20%20%7D%20else%20if%20(window.jQuery)%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20console.log(%60jQuerify%3A%20Loaded%20after%20%24%7Bcounter%20*%20timeoutLength%7D%20ms%60)%0A%20%20%20%20%20%20%20%20%7D%20else%20%7B%0A%20%20%20%20%20%20%20%20%20%20%20%20counter%2B%2B%0A%20%20%20%20%20%20%20%20%20%20%20%20setTimeout(waitForLoad%2C%20timeoutLength)%0A%20%20%20%20%20%20%20%20%7D%0A%20%20%20%20%7D%0A%0A%7D)()%7D)()%3B",
+                    "url": "javascript:%3B(()%3D%3E%7B%0Aif%20(window.jQuery)%20%7B%0Aconsole.log(%60jQuerify%3A%20Already%20loaded%60)%0Areturn%0A%7D%0A%0Alet%20s%20%3D%20document.createElement('script')%0As.src%20%3D%20%22https%3A%2F%2Fcdnjs.cloudflare.com%2Fajax%2Flibs%2Fjquery%2F3.5.1%2Fjquery.min.js%22%0Adocument.head.appendChild(s)%0A%0Alet%20counter%20%3D%200%0Alet%20timeoutLength%20%3D%205%0Alet%20timeoutLimit%20%3D%201000%0A%0AwaitForLoad()%0A%0Afunction%20waitForLoad()%20%7B%0Aif%20(counter%20*%20timeoutLength%20%3E%3D%20timeoutLimit)%20%7B%0Aconsole.log(%60jQuerify%3A%20Timed-out%20after%20%24%7BtimeoutLimit%7D%20ms%60)%0Aalert('Error%3A%20jQuery%20not%20loaded.')%0Areturn%0A%7D%20else%20if%20(window.jQuery)%20%7B%0Aconsole.log(%60jQuerify%3A%20Loaded%20after%20%24%7Bcounter%20*%20timeoutLength%7D%20ms%60)%0A%7D%20else%20%7B%0Acounter%2B%2B%0AsetTimeout(waitForLoad%2C%20timeoutLength)%0A%7D%0A%7D%7D)()%3B",
                     "description": "Adds jQuery to the webpage. Useful for testing things in DevTools console.",
                     "src": ""
                 }, {
                     "name": "Copy Title & Url",
-                    "code": "javascript:%3B(()%3D%3E%7B(function()%20%7B%0Afunction%20getURL()%20%7B%0Areturn%20document.URL%0A%7D%0A%0Afunction%20getTitle(url)%20%7B%0Aif%20(url.indexOf('mail.google.com')%20!%3D%3D%20-1)%20%7B%0Areturn%20document.title.replace(%2F%20-%20.*%3F%40gmail.com%20-%20Gmail%24%2F%2C%20'%20-%20Gmail')%0A%7D%20else%20%7B%0Areturn%20document.title%0A%7D%0A%7D%0A%0Aconst%20url%20%3D%20getURL()%0Aconst%20title%20%3D%20getTitle(url)%0A%0AcopyLink(url%2C%20title)%0A%0Afunction%20copyLink(url%2C%20title)%20%7B%0Afunction%20listener(e)%20%7B%0Ae.clipboardData.setData(%22text%2Fplain%22%2C%20title%20%2B%20'%0A'%20%2B%20url)%0Ae.clipboardData.setData(%22text%2Fhtml%22%2C%20%60%3Ca%20href%3D%22%24%7Burl%7D%22%3E%24%7Btitle%7D%3C%2Fa%3E%60)%0Ae.preventDefault()%0A%7D%0A%0Adocument.addEventListener(%22copy%22%2C%20listener)%0A%0Atry%20%7B%0Adocument.execCommand(%22copy%22)%0Aconsole.log(%22Copied%3A%0A%22%2C%20%7B%0Atitle%2C%0Aurl%0A%7D)%0A%7D%20catch%20(e)%20%7B%0Aconsole.log(%22Copy%20failed.%22%2C%20e)%0A%7D%20finally%20%7B%0Adocument.removeEventListener(%22copy%22%2C%20listener)%0A%7D%0A%7D%0A%7D)()%7D)()%3B",
+                    "url": "javascript:%3B(()%3D%3E%7B(function()%20%7B%0Afunction%20getURL()%20%7B%0Areturn%20document.URL%0A%7D%0A%0Afunction%20getTitle(url)%20%7B%0Aif%20(url.indexOf('mail.google.com')%20!%3D%3D%20-1)%20%7B%0Areturn%20document.title.replace(%2F%20-%20.*%3F%40gmail%5C.com%20-%20Gmail%24%2F%2C%20'%20-%20Gmail')%0A%7D%20else%20%7B%0Areturn%20document.title%0A%7D%0A%7D%0A%0Aconst%20url%20%3D%20getURL()%0Aconst%20title%20%3D%20getTitle(url)%0A%0AcopyLink(url%2C%20title)%0A%0Afunction%20copyLink(url%2C%20title)%20%7B%0Afunction%20listener(e)%20%7B%0Ae.clipboardData.setData(%22text%2Fplain%22%2C%20title%20%2B%20'%5Cn'%20%2B%20url)%0Ae.clipboardData.setData(%22text%2Fhtml%22%2C%20%60%3Ca%20href%3D%22%24%7Burl%7D%22%3E%24%7Btitle%7D%3C%2Fa%3E%60)%0Ae.preventDefault()%0A%7D%0A%0Adocument.addEventListener(%22copy%22%2C%20listener)%0A%0Atry%20%7B%0Adocument.execCommand(%22copy%22)%0Aconsole.log(%22Copied%3A%20%5Cn%22%2C%20%7B%0Atitle%2C%0Aurl%0A%7D)%0A%7D%20catch%20(e)%20%7B%0Aconsole.log(%22Copy%20failed.%22%2C%20e)%0A%7D%20finally%20%7B%0Adocument.removeEventListener(%22copy%22%2C%20listener)%0A%7D%0A%7D%0A%7D)()%7D)()%3B",
                     "description": "Copies a webpage's title and URL. Will be pasted as a link if supported in app (Roam, Notion, Circle, Gmail), or else as plain text separated with a linebreak (Zoom).",
                     "src": ""
                 }]
                 // , {
                 //     "name": "",
-                //     "code": "",
+                //     "url": "",
                 //     "description": "",
                 //     "src": ""
                 // }
@@ -65,6 +65,77 @@
             mounted() {
 
             }
+        })
+    </script>
+
+    <section id="vm-app-bookmarklet-maker" class="section">
+        <div class="container">
+            <h1 class="title">Bookmarklet Maker</h1>
+            <p>Instructions: Paste code in the textarea to convert into a bookmarklet</p>
+            <input v-model="name" placeholder="Name">
+            <div class="columns">
+                <div class="column">
+                    <textarea class="textarea" v-model="code" placeholder="Code"></textarea>
+                </div>
+
+                <div class="column">
+                    <textarea class="textarea" v-model="url" readonly></textarea>
+                    <button class="button" @click="copy(url)">Copy</button>
+                </div>
+            </div>
+
+
+        </div>
+    </section>
+
+    <script>
+        var vm2 = new Vue({
+            el: "#vm-app-bookmarklet-maker",
+            data: {
+                name: '', // text input
+                code: '', // textarea
+            },
+
+            computed: {
+                url() {
+                    return 'javascript:' + encodeURIComponent(this.createIIFE(this.code))
+                },
+                html() {
+                    return `<a class="bookmarklet" href="${this.url}">${this.name}</a>`
+                },
+            },
+
+            methods: {
+                createIIFE(code) { // https://en.wikipedia.org/wiki/Immediately_invoked_function_expression
+                    code = this.trimLines(code)
+                    return `;(()=>{${code}})();`
+                },
+
+                trimLines(text) {
+                    return text
+                        .split(/\r?\n/)
+                        .map(line => line.trim())
+                        .join('\n')
+                },
+
+                copy(text_to_copy) {
+                    function listener(e) {
+                        e.clipboardData.setData("text/plain", text_to_copy)
+                        e.preventDefault()
+                    }
+
+                    document.addEventListener("copy", listener)
+
+                    try {
+                        document.execCommand("copy")
+                        console.log("Copied:", text_to_copy)
+                    } catch (e) {
+                        console.log("Copy failed.", e)
+                    } finally {
+                        document.removeEventListener("copy", listener)
+                    }
+                }
+            },
         })
     </script>
 
