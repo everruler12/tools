@@ -17,7 +17,7 @@
             margin-bottom: 0.5em
         }
 
-        .bookmarklet>a {
+        a.bookmarklet {
             padding-top: 0;
             padding-bottom: 0;
             height: 1.5em;
@@ -31,7 +31,7 @@
         <div class="container">
             <h1 class="title">Bookmarklets</h1>
             <p>Instructions: Drag the button to your bookmarks bar. The bookmarklet will run the script on the active page when clicked.</p>
-            <p class="bookmarklet" v-for="bm in bookmarklets">
+            <p v-for="bm in bookmarklets">
                 <a class="button bookmarklet" :href="bm.url" @click.prevent>{{bm.name}}</a>
                 <span>{{bm.description}}</span>
             </p>
@@ -76,7 +76,7 @@
         <div class="container">
             <h1 class="title">Bookmarklet Maker</h1>
             <p>Instructions: Paste code in the textarea below to convert into a bookmarklet.</p>
-            <input v-model="name" placeholder="Name">
+            <input v-model="name" placeholder="Name" @focus="$event.target.select()">
             <div class="columns">
                 <div class="column">
                     <textarea class="textarea" v-model="code" placeholder="Code"></textarea>
@@ -85,6 +85,8 @@
                 <div class="column">
                     <textarea class="textarea" v-model="url" readonly></textarea>
                     <button class="button" @click="copy(url)">Copy</button>
+                    <span>Bookmarklet to drag:</span>
+                    <a class="button bookmarklet" :href="url" @click.prevent>{{name}}</a>
                 </div>
             </div>
 
@@ -96,16 +98,13 @@
         var vm2 = new Vue({
             el: "#vm-app-bookmarklet-maker",
             data: {
-                name: '', // text input
+                name: 'Bookmarklet', // text input
                 code: '', // textarea
             },
 
             computed: {
                 url() {
                     return 'javascript:' + encodeURIComponent(this.createIIFE(this.code))
-                },
-                html() {
-                    return `<a class="bookmarklet" href="${this.url}">${this.name}</a>`
                 },
             },
 
@@ -119,6 +118,7 @@
                     return text
                         .split(/\r?\n/)
                         .map(line => line.trim())
+                        .filter(line => line != "")
                         .join('\n')
                 },
 
