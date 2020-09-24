@@ -40,6 +40,7 @@
             // Ctrl/Cmd+Shift+H to add highlights escaped from bolded section
             if (e.keyCode == 72 && e.shiftKey && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
                 e.preventDefault()
+                e.stopImmediatePropagation()
                 // check if textarea focused
                 let focused_textarea = $('textarea[id^="block-input"]:focus')
                 if (focused_textarea.length)
