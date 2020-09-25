@@ -1,0 +1,1 @@
+vercel rm tools --safe --yes
