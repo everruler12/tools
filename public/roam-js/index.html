@@ -202,6 +202,25 @@
                     } finally {
                         document.removeEventListener("copy", listener)
                     }
+                },
+
+                downloadHtml(clipboard_data) {
+                    clipboard_data = JSON.parse(JSON.stringify(clipboard_data))
+
+                    let html = /*html*/ `<button class="button" onclick="copyCode()">Copy code</button>
+<script>
+    function copyCode() {
+        let listener = function(e) {
+            e.clipboardData.setData("text/plain", ${JSON.stringify(clipboard_data.text_plain)})
+            e.clipboardData.setData("text/html", ${JSON.stringify(clipboard_data.text_html)})
+            e.clipboardData.setData("roam/data", ${JSON.stringify(clipboard_data.roam_data)})
+            e.preventDefault()
+        }
+        document.addEventListener("copy", listener)
+        document.execCommand("copy")
+        document.removeEventListener("copy", listener)
+    }
+<\/script>`
                 }
             },
         })
