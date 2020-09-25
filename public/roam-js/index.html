@@ -65,23 +65,24 @@
     <section id="vm-app-roam-clipboard" class="section">
         <div class="container">
             <h1 class="title">Roam Clipboard</h1>
-            <p>Instructions: Copy Roam blocks and paste in the textarea below to create an HTML copy button.</p>
+            <p>Instructions: Copy Roam blocks and paste in the textarea below to create HTML for download.</p>
             <div class="columns">
                 <div class="column">
                     <input v-model="name" placeholder="Name" @focus="$event.target.select()">
                     <!-- <textarea id="clipboard-input" class="textarea" v-model="clipboard_input" placeholder="Paste here" @focus="clipboard_input=''" @paste="clipboard_input=''"></textarea> -->
-                    <textarea id="clipboard-input" class="textarea" v-model="clipboard_input" placeholder="Paste here"></textarea>
+                    <textarea id="clipboard-input" class="textarea" v-model="clipboard_input" placeholder="Paste here" @focus="clipboard_input=''"></textarea>
                     <button class="button" @click="clipboard_input=''">Clear</button>
                 </div>
 
                 <div class="column">
                     <p>Clipboard data:</p>
-                    <textarea class="textarea" v-model="output_pretty" readonly></textarea>
+                    <!-- <textarea class="textarea" v-model="output_pretty" readonly></textarea> -->
+                    <textarea class="textarea" v-model="clipboard_output_html" readonly></textarea>
                     <button class="button" @click="clipboard_output={}">Clear</button>
-                    <button class="button" @click="copy(clipboard_output)">Copy above object as plain text</button>
-                    <button class="button" @click="copyRoamData(clipboard_output)">Copy Roam data</button>
-                    <button class="button" @click="downloadHtml(clipboard_output)">Download .html</button>
-                    <button class="button" @click="copyHtml(clipboard_output)">Copy html</button>
+                    <!-- <button class="button" @click="copy(clipboard_output)">Copy above object as plain text</button> -->
+                    <!-- <button class="button" @click="copyRoamData(clipboard_output)">Copy Roam data</button> -->
+                    <button class="button" @click="copyHtml(clipboard_output)">Copy</button>
+                    <button class="button" @click="downloadHtml(clipboard_output)">Download</button>
                     <!-- <span>Bookmarklet to drag:</span> -->
                     <!-- <a class="button bookmarklet" :href="url" @click.prevent>{{name}}</a> -->
                 </div>
@@ -99,6 +100,7 @@
                 name: 'Roam blocks', // text input
                 clipboard_input: '', // textarea, listen for paste event
                 clipboard_output: {},
+                clipboard_output_html: '',
                 scripts: [{
                     name: 'add-highlights-escaped-from-bold-keyboard-shortcut',
                     clipboard_data: {
@@ -148,24 +150,14 @@
                         }
                         // console.log(clipboard_data)
 
-                        if (clipboard_data.roam_data == "")
+                        if (clipboard_data.roam_data == "") {
                             alert("That is not valid roam/data")
-
-                        _this.clipboard_output = clipboard_data
+                            _this.clipboard_input = ''
+                        } else {
+                            // _this.clipboard_output = clipboard_data
+                            _this.clipboard_output_html = this.clipboardDataToHtml(clipboard_data)
+                        }
                     })
-                },
-
-                createIIFE(code) { // https://en.wikipedia.org/wiki/Immediately_invoked_function_expression
-                    code = this.trimLines(code)
-                    return `;(()=>{${code}})();`
-                },
-
-                trimLines(text) {
-                    return text
-                        .split(/\r?\n/)
-                        .map(line => line.trim())
-                        .filter(line => line != "")
-                        .join('\n')
                 },
 
                 copy(text_to_copy) {
