@@ -94,7 +94,15 @@
             data: {
                 name: 'Roam blocks', // text input
                 clipboard_input: '', // textarea, listen for paste event
-                clipboard_output: {}
+                clipboard_output: {},
+                scripts: [{
+                    name: 'add-highlights-escaped-from-bold-keyboard-shortcut',
+                    clipboard_data: {
+                        "text_plain": "\n{{roam/js}}\n    ```javascript\n/*\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\nBy Erik Newhard\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\n*/\n\n;(function() {\n  let s = document.createElement('script')\n  s.src = \"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\"\n  document.head.appendChild(s)\n})();```\n\n",
+                        "text_html": "<html>\r\n<body>\r\n<!--StartFragment--><div><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span></span></span></p><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span>{{roam/js}}</span></span><div><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\">\t</span><span style=\"text-align:inherit;\"><span><pre><code>javascript\n/*\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\nBy Erik Newhard\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\n*/\n\n;(function() {\n  let s = document.createElement('script')\n  s.src = \"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\"\n  document.head.appendChild(s)\n})();</code></pre></span></span></p></div></p><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span></span></span></p></div><!--EndFragment-->\r\n</body>\r\n</html>",
+                        "roam_data": "[\"^ \",\"~:db-id\",\"roam-depot-developers\",\"~:type\",\"~:copy\",\"~:copied-data\",[[\"^ \",\"~:block/string\",\"\",\"~:children/view-type\",\"~:document\",\"~:create/email\",\"erik.newhard@gmail.com\",\"~:create/time\",1600921187513,\"~:block/uid\",\"BNNgX6o0l\",\"~:block/open\",true,\"~:edit/time\",1600924748968,\"~:edit/email\",\"erik.newhard@gmail.com\",\"~:block/order\",7],[\"^ \",\"^4\",\"{{roam/js}}\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600920980996,\"~:block/children\",[[\"^ \",\"^4\",\"~```javascript\\n/*\\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\\nBy Erik Newhard\\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\\n*/\\n\\n;(function() {\\n  let s = document.createElement('script')\\n  s.src = \\\"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\\\"\\n  document.head.appendChild(s)\\n})();```\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600921175646,\"^9\",\"f9f1BFs5H\",\"^:\",true,\"^;\",1600964872243,\"^<\",\"erik.newhard@gmail.com\",\"^=\",0]],\"^9\",\"-zI-sl2wA\",\"^:\",true,\"^;\",1600920988194,\"^<\",\"erik.newhard@gmail.com\",\"^=\",8],[\"^ \",\"^4\",\"\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600924350980,\"^9\",\"pu3Br1Ssw\",\"^:\",true,\"^;\",1600924763834,\"^<\",\"erik.newhard@gmail.com\",\"^=\",9]]]"
+                    }
+                }]
             },
 
             computed: {
@@ -104,25 +112,45 @@
             },
 
             mounted() {
-                var input_el = document.getElementById("clipboard-input")
-                let _this = this
-                input_el.addEventListener("paste", function(e) {
-                    console.log(e.clipboardData)
+                // if (window.location.search) {
+                //     let pairs = window.location.search.substring(1) // query
+                //         .split('&') // pairs
+                //         .map(pair => {
+                //             pair = pair.split('=')
+                //             return {
+                //                 name: pair[0],
+                //                 value: decodeURIComponent(pair[1])
+                //             }
+                //         })
 
-                    let clipboard_data = {
-                        text_plain: e.clipboardData.getData("text/plain"),
-                        text_html: e.clipboardData.getData("text/html"),
-                        roam_data: e.clipboardData.getData("roam/data")
-                    }
-                    console.log(clipboard_data)
 
-                    if (clipboard_data.roam_data == "") alert("That is not valid roam/data")
+                // } else {
+                this.listenForPaste()
+                // }
 
-                    _this.clipboard_output = clipboard_data
-                })
+
             },
 
             methods: {
+                listenForPaste() {
+                    let _this = this
+                    let el = document.getElementById("clipboard-input")
+                    el.addEventListener("paste", function(e) {
+                        // console.log(e.clipboardData)
+                        let clipboard_data = {
+                            text_plain: e.clipboardData.getData("text/plain"),
+                            text_html: e.clipboardData.getData("text/html"),
+                            roam_data: e.clipboardData.getData("roam/data")
+                        }
+                        // console.log(clipboard_data)
+
+                        if (clipboard_data.roam_data == "")
+                            alert("That is not valid roam/data")
+
+                        _this.clipboard_output = clipboard_data
+                    })
+                },
+
                 createIIFE(code) { // https://en.wikipedia.org/wiki/Immediately_invoked_function_expression
                     code = this.trimLines(code)
                     return `;(()=>{${code}})();`
