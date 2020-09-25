@@ -38,7 +38,7 @@
 
         document.addEventListener("keydown", function(e) {
             // Ctrl/Cmd+Shift+H to add highlights escaped from bolded section
-            if (e.keyCode == 72 && e.shiftKey && (navigator.platform.match("Mac") ? e.metaKey : e.ctrlKey)) {
+            if (e.keyCode == 72 && e.shiftKey && (e.metaKey || e.ctrlKey)) {
                 e.preventDefault()
                 e.stopImmediatePropagation()
                 // check if textarea focused
