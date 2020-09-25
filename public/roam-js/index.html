@@ -74,7 +74,9 @@
                     return JSON.stringify(this.clipboard_output, null, 2)
                 },
                 html_name() {
-                    return this.name.toLowerCase().split(' ').join('-') + '.html'
+                    return this.name.toLowerCase()
+                        .split(' ').join('-') // .replace(/ /g, '-')
+                        .replace(/\(|\)/g, '') + '.html'
                 }
             },
 
