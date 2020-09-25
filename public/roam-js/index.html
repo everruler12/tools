@@ -71,7 +71,7 @@
                     <input v-model="name" placeholder="Name" @focus="$event.target.select()">
                     <!-- <textarea id="clipboard-input" class="textarea" v-model="clipboard_input" placeholder="Paste here" @focus="clipboard_input=''" @paste="clipboard_input=''"></textarea> -->
                     <textarea id="clipboard-input" class="textarea" placeholder="Paste here" @paste="clipboard_input=''"></textarea>
-                    <button class="button" @click="clipboard_input={}">Clear</button>
+                    <button class="button" @click="clipboard_input=''">Clear</button>
                 </div>
 
                 <div class="column">
