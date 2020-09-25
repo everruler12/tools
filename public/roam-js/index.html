@@ -13,6 +13,9 @@
     <script src="/assets/vue-2.6.12.js"></script>
     <link rel="stylesheet" href="/assets/bulma.min.css">
     <style>
+        .label {
+            margin-top: 0.5em;
+        }
     </style>
 </head>
 
@@ -20,93 +23,86 @@
     <section id="vm-app-roam-clipboard" class="section">
         <div class="container">
             <h1 class="title">Roam Clipboard</h1>
-            <p>Instructions: Copy Roam blocks and paste in the textarea below to create HTML for download.</p>
+            <p>Paste Roam blocks in the textarea below</p>
             <div class="columns">
                 <div class="column">
-                    <input v-model="name" placeholder="Name" @focus="$event.target.select()">
-                    <!-- <textarea id="clipboard-input" class="textarea" v-model="clipboard_input" placeholder="Paste here" @focus="clipboard_input=''"  @paste="clipboard_input=''"></textarea> -->
-                    <textarea id="clipboard-input" class="textarea" v-model="clipboard_input" placeholder="Paste here" @focus="clipboard_input=''"></textarea>
-                    <!-- <button class="button" @click="clipboard_input=''">Clear</button> -->
+                    <input class="input" v-model="name" placeholder="Name" @focus="$event.target.select()">
+                    <textarea id="clipboard-input" class="textarea" v-model="clipboard_input" placeholder="Paste here" readonly @paste="onPaste"></textarea>
+                    <!-- <textarea id="clipboard-input" class="textarea" v-model="clipboard_input" placeholder="Paste here" @focus="clipboard_input=''" ></textarea> -->
                 </div>
 
                 <div class="column">
-                    <p>Clipboard data:</p>
-                    <div>
-                        <textarea class="textarea" v-model="output_pretty" readonly></textarea>
-                        <!-- <button class="button" @click="clipboard_output={}">Clear</button> -->
-                        <button class="button" @click="copy(output_pretty)">Copy above result as plain text</button>
-                        <button class="button" @click="copyRoamData(clipboard_output)">Copy back as Roam data</button>
-                    </div>
-                    <div>
-                        <br>
-                        <textarea class="textarea" v-model="clipboard_output_html" readonly></textarea>
-                        <button class="button" @click="copyHtml(clipboard_output)">Copy</button>
-                        <button class="button" @click="downloadHtml(clipboard_output)">Download</button>
-                    </div>
+                    <p class="label">Output</p>
+                    <textarea class="textarea" v-model="output_str" readonly rows="11"></textarea>
+                    <button class="button" @click="copy(output_str)">Copy</button>
+                    <button class="button" @click="copyRoamData()">Copy back as roam/data</button>
+
                 </div>
             </div>
-
+            <div>
+                <p class="label">HTML</p>
+                <textarea class="textarea" v-model="output_html" readonly rows="11"></textarea>
+                <button class="button" @click="copy(output_html)">Copy</button>
+                <button class="button" @click="downloadHtml()">Download</button>
+            </div>
 
         </div>
     </section>
 
     <script>
-        // TODO: if no roam/data, convert script as plain text into roam data
+        // TODO: if no roamdata, convert script as plain text into roam data
         var vm = new Vue({
             el: "#vm-app-roam-clipboard",
+
             data: {
                 name: 'Roam blocks',
+                text_plain: '',
+                text_html: '',
+                roam_data: '',
                 clipboard_input: '',
-                clipboard_output: {},
-                clipboard_output_html: '',
-                scripts: [{
-                    name: 'add-highlights-escaped-from-bold-keyboard-shortcut',
-                    clipboard_data: {
-                        "text_plain": "\n{{roam/js}}\n    ```javascript\n/*\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\nBy Erik Newhard\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\n*/\n\n;(function() {\n  let s = document.createElement('script')\n  s.src = \"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\"\n  document.head.appendChild(s)\n})();```\n\n",
-                        "text_html": "<html>\r\n<body>\r\n<!--StartFragment--><div><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span></span></span></p><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span>{{roam/js}}</span></span><div><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\">\t</span><span style=\"text-align:inherit;\"><span><pre><code>javascript\n/*\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\nBy Erik Newhard\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\n*/\n\n;(function() {\n  let s = document.createElement('script')\n  s.src = \"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\"\n  document.head.appendChild(s)\n})();</code></pre></span></span></p></div></p><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span></span></span></p></div><!--EndFragment-->\r\n</body>\r\n</html>",
-                        "roam_data": "[\"^ \",\"~:db-id\",\"roam-depot-developers\",\"~:type\",\"~:copy\",\"~:copied-data\",[[\"^ \",\"~:block/string\",\"\",\"~:children/view-type\",\"~:document\",\"~:create/email\",\"erik.newhard@gmail.com\",\"~:create/time\",1600921187513,\"~:block/uid\",\"BNNgX6o0l\",\"~:block/open\",true,\"~:edit/time\",1600924748968,\"~:edit/email\",\"erik.newhard@gmail.com\",\"~:block/order\",7],[\"^ \",\"^4\",\"{{roam/js}}\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600920980996,\"~:block/children\",[[\"^ \",\"^4\",\"~```javascript\\n/*\\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\\nBy Erik Newhard\\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\\n*/\\n\\n;(function() {\\n  let s = document.createElement('script')\\n  s.src = \\\"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\\\"\\n  document.head.appendChild(s)\\n})();```\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600921175646,\"^9\",\"f9f1BFs5H\",\"^:\",true,\"^;\",1600964872243,\"^<\",\"erik.newhard@gmail.com\",\"^=\",0]],\"^9\",\"-zI-sl2wA\",\"^:\",true,\"^;\",1600920988194,\"^<\",\"erik.newhard@gmail.com\",\"^=\",8],[\"^ \",\"^4\",\"\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600924350980,\"^9\",\"pu3Br1Ssw\",\"^:\",true,\"^;\",1600924763834,\"^<\",\"erik.newhard@gmail.com\",\"^=\",9]]]"
-                    }
-                }]
             },
 
             computed: {
-                output_pretty() {
-                    return JSON.stringify(this.clipboard_output, null, 2)
-                },
                 html_name() {
                     return this.name.toLowerCase()
                         .split(' ').join('-') // .replace(/ /g, '-')
                         .replace(/\(|\)|\//g, '') + '.html' // ( ) /
+                },
+                output_json() {
+                    return {
+                        name: this.name,
+                        html_name: this.html_name,
+                        text_plain: this.text_plain,
+                        text_html: this.text_html,
+                        roam_data: this.roam_data
+                    }
+                },
+                output_str() {
+                    return JSON.stringify(this.output_json, null, 2)
+                },
+                // output_html() {
+                //     return this.outputToHtml(this.output_json)
+                // }
+                output_html() {
+                    return this.outputToHtml(this.output_json)
                 }
             },
 
-            mounted() {
-                this.listenForPaste()
-            },
+            mounted() {},
 
             methods: {
-                listenForPaste() {
-                    let _this = this
-                    let el = document.getElementById("clipboard-input")
-                    el.addEventListener("paste", function(e) {
-                        // console.log(e.clipboardData)
-                        let clipboard_data = {
-                            name: _this.name,
-                            html_name: _this.html_name,
-                            text_plain: e.clipboardData.getData("text/plain"),
-                            text_html: e.clipboardData.getData("text/html"),
-                            roam_data: e.clipboardData.getData("roam/data")
-                        }
-                        // console.log(clipboard_data)
+                onPaste(e) {
 
-                        if (clipboard_data.roam_data == "") {
-                            alert("That is not valid roam/data")
-                            _this.clipboard_input = ''
-                        } else {
-                            _this.clipboard_output = clipboard_data
-                            _this.clipboard_output_html = _this.clipboardDataToHtml(clipboard_data)
-                        }
-                    })
+                    // console.log(e)
+                    this.text_plain = e.clipboardData.getData("text/plain")
+                    this.text_html = e.clipboardData.getData("text/html")
+                    this.roam_data = e.clipboardData.getData("roam/data")
+
+                    if (this.roam_data == "") {
+                        alert("No roam/data in that paste")
+                    }
+
+                    return true // must return true for paste event to work //https://stackoverflow.com/questions/44536362/how-to-handle-pastectrlv-or-with-mouse-event-in-vue-js
                 },
 
                 copy(text_to_copy) {
@@ -127,13 +123,13 @@
                     }
                 },
 
-                copyRoamData(clipboard_data) {
-                    clipboard_data = JSON.parse(JSON.stringify(clipboard_data))
+                copyRoamData() {
+                    let data = JSON.parse(JSON.stringify(this.output_json))
 
                     function listener(e) {
-                        e.clipboardData.setData("text/plain", clipboard_data.text_plain)
-                        e.clipboardData.setData("text/html", clipboard_data.text_html)
-                        e.clipboardData.setData("roam/data", clipboard_data.roam_data)
+                        e.clipboardData.setData("text/plain", data.text_plain)
+                        e.clipboardData.setData("text/html", data.text_html)
+                        e.clipboardData.setData("roam/data", data.roam_data)
                         e.preventDefault()
                     }
 
@@ -141,7 +137,7 @@
 
                     try {
                         document.execCommand("copy")
-                        console.log("Copied:", clipboard_data)
+                        console.log("Copied:", data)
                     } catch (e) {
                         console.log("Copy failed.", e)
                     } finally {
@@ -149,13 +145,13 @@
                     }
                 },
 
-                clipboardDataToHtml(clipboard_data) {
-                    clipboard_data = JSON.parse(JSON.stringify(clipboard_data))
+                outputToHtml(data) {
+                    data = JSON.parse(JSON.stringify(data))
 
                     let code = `let l = function(e) {
-e.clipboardData.setData("text/plain", ${JSON.stringify(clipboard_data.text_plain)})
-e.clipboardData.setData("text/html", ${JSON.stringify(clipboard_data.text_html)})
-e.clipboardData.setData("roam/data", ${JSON.stringify(clipboard_data.roam_data)})
+e.clipboardData.setData("text/plain", ${JSON.stringify(data.text_plain)})
+e.clipboardData.setData("text/html", ${JSON.stringify(data.text_html)})
+e.clipboardData.setData("roam/data", ${JSON.stringify(data.roam_data)})
 e.preventDefault()
 }
 document.addEventListener("copy", l)
@@ -164,12 +160,12 @@ document.removeEventListener("copy", l)`
 
                     let bookmarklet = 'javascript:' + encodeURIComponent(`;(()=>{${code}})();`)
 
-                    return /*html*/ `<!DOCTYPE html>
+                    let html = /*html*/ `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>${clipboard_data.name}</title>
+    <title>${data.name}</title>
     <style>
         body {overflow: hidden;}
         form {margin-block-end: 0;}
@@ -178,29 +174,23 @@ document.removeEventListener("copy", l)`
 </head>
 <body>
     <form action="${bookmarklet}">
-        <button title="${clipboard_data.name}">Copy code</button>
+        <button title="${data.name}">Copy code</button>
     </form>
 </body>
 </html>`
+
+                    return html
                 },
 
-                downloadHtml(clipboard_data) {
-                    let html = this.clipboardDataToHtml(clipboard_data)
-
+                downloadHtml() {
                     let a = $('<a>', {
-                        'href': 'data:text/html;charset=utf-8,' + encodeURIComponent(html),
-                        'download': clipboard_data.html_name,
+                        'href': 'data:text/html;charset=utf-8,' + encodeURIComponent(this.output_html),
+                        'download': this.html_name,
                         'style': 'display:none;'
                     }).appendTo('body')
                     a[0].click()
                     a.remove()
                 },
-
-                copyHtml(clipboard_data) {
-                    let html = this.clipboardDataToHtml(clipboard_data)
-
-                    this.copy(html)
-                }
             },
         })
     </script>
