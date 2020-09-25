@@ -1,0 +1,12 @@
+{
+    "version": 2,
+    "routes": [{
+            "src": "/bookmarklets",
+            "dest": "/bookmarklets/index.html"
+        },
+        {
+            "src": "/roam-js",
+            "dest": "/roam-js/index.html"
+        }
+    ]
+}
