@@ -76,7 +76,7 @@
                 html_name() {
                     return this.name.toLowerCase()
                         .split(' ').join('-') // .replace(/ /g, '-')
-                        .replace(/\(|\)/g, '') + '.html'
+                        .replace(/\(|\)|\//g, '') + '.html' // ( ) /
                 }
             },
 
