@@ -78,8 +78,8 @@
                     <p>Clipboard data:</p>
                     <textarea class="textarea" v-model="output_pretty" readonly></textarea>
                     <button class="button" @click="clipboard_output={}">Clear</button>
-                    <button class="button" @click="copy(output_pretty)">Copy above object as plain text</button>
-                    <button class="button" @click="copyRoamData(clipboard_output)">Copy Roam data</button>
+                    <button class="button" @click="copy(output_pretty)">Copy above result as plain text</button>
+                    <button class="button" @click="copyRoamData(clipboard_output)">Copy back as Roam data</button>
                     <br>
                     <textarea class="textarea" v-model="clipboard_output_html" readonly></textarea>
                     <button class="button" @click="copyHtml(clipboard_output)">Copy</button>
@@ -221,7 +221,7 @@ document.removeEventListener("copy", l)`
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title></title>
+    <title>${name}</title>
     <style>
         body {overflow: hidden;}
         form {margin-block-end: 0;}
@@ -241,7 +241,7 @@ document.removeEventListener("copy", l)`
 
                     let a = $('<a>', {
                         'href': 'data:text/html;charset=utf-8,' + encodeURIComponent(html),
-                        'download': 'copy roam-js.html',
+                        'download': vm.name + '.html',
                         'style': 'display:none;'
                     }).appendTo('body')
                     a[0].click()
