@@ -78,6 +78,7 @@
                     <textarea class="textarea" v-model="output_pretty" readonly></textarea>
                     <button class="button" @click="copyRoamData(clipboard_output)">Copy</button>
                     <button class="button" @click="clipboard_output={}">Clear</button>
+                    <button class="button" @click="downloadHtml(clipboard_output)">Download .html</button>
                     <!-- <span>Bookmarklet to drag:</span> -->
                     <!-- <a class="button bookmarklet" :href="url" @click.prevent>{{name}}</a> -->
                 </div>
@@ -221,6 +222,14 @@
         document.removeEventListener("copy", listener)
     }
 <\/script>`
+
+                    let a = $('<a>', {
+                        'href': 'data:text/html;charset=utf-8,' + encodeURIComponent(html),
+                        'download': 'roam-js script.html',
+                        'style': 'display:none;'
+                    }).appendTo('body')
+                    a[0].click()
+                    a.remove()
                 }
             },
         })
