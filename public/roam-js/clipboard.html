@@ -32,7 +32,7 @@
 
                 <div class="column">
                     <p class="label">Output</p>
-                    <textarea class="textarea" v-model="output_str" readonly rows="11"></textarea>
+                    <textarea class="textarea" v-model="output_str" readonly rows="8"></textarea>
                     <button class="button" @click="copy(output_str)">Copy</button>
                     <button class="button" @click="copyRoamData()">Copy back as roam/data</button>
 
@@ -40,11 +40,12 @@
             </div>
             <div>
                 <p class="label">HTML</p>
-                <textarea class="textarea" v-model="output_html" readonly rows="11"></textarea>
+                <textarea class="textarea" v-model="output_html" readonly rows="10"></textarea>
                 <button class="button" @click="copy(output_html)">Copy</button>
                 <button class="button" @click="downloadHtml()">Download</button>
             </div>
-
+            <br>
+            <p v-pre>Add to a Roam page with {{iframe: }}</p>
         </div>
     </section>
 
