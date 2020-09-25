@@ -36,8 +36,9 @@
                     $('.bp3-portal').find('.bp3-menu').find('div:contains(Expand all)').click()
                 }
             }
-            console.log('listening')
+
             document.addEventListener("keydown", listener)
+            console.log('Expand/collapse all blocks on page: listening for Ctrl/Cmd+Shift+Up and Ctrl/Cmd+Shift+Down')
 
             window.listeningForKeyboardShortcut_expandCollapseAllBlocks = listener
         }
