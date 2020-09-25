@@ -34,21 +34,26 @@
     }
 
     function listenForKeydown() {
-        if (window.listeningForKeyboardShortcut_AddHighlightsEscapedFromBold) return
+        let listener = window.listeningForKeyboardShortcut_AddHighlightsEscapedFromBold
 
-        document.addEventListener("keydown", function(e) {
+        if (listener)
+            document.removeEventListener("keydown", listener)
+
+        listener = function(e) {
             // Ctrl/Cmd+Shift+H to add highlights escaped from bolded section
             if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.keyCode == 72) {
                 e.preventDefault()
                 e.stopImmediatePropagation()
-                // check if textarea focused
                 let focused_textarea = $('textarea[id^="block-input"]:focus')
                 if (focused_textarea.length)
                     focused_textarea.surroundSelectedText("**^^**", "**^^**") // Rangyinputs function
             }
-        }, false)
+        }
 
-        window.listeningForKeyboardShortcut_AddHighlightsEscapedFromBold = true
+        document.addEventListener("keydown", listener)
+        // console.log('Add highlights escaped from bold: listening for Ctrl/Cmd+Shift+H')
+
+        window.listeningForKeyboardShortcut_AddHighlightsEscapedFromBold = listener
     }
 
     function appendFile(url) {
@@ -67,7 +72,7 @@
     }) {
 
         if (isLoaded()) {
-            console.log(`${name}: Already loaded.`)
+            // console.log(`${name}: Already loaded.`)
             callback()
             return
         }

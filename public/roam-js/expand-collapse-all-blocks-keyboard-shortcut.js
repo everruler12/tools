@@ -38,7 +38,7 @@
             }
 
             document.addEventListener("keydown", listener)
-            console.log('Expand/collapse all blocks on page: listening for Ctrl/Cmd+Shift+Up and Ctrl/Cmd+Shift+Down')
+            // console.log('Expand/collapse all blocks on page: listening for Ctrl/Cmd+Shift+Up and Ctrl/Cmd+Shift+Down')
 
             window.listeningForKeyboardShortcut_expandCollapseAllBlocks = listener
         }
@@ -59,7 +59,7 @@
         }) {
 
             if (isLoaded()) {
-                console.log(`${name}: Already loaded.`)
+                // console.log(`${name}: Already loaded.`)
                 callback()
                 return
             }
