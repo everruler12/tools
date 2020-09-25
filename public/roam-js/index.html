@@ -77,8 +77,10 @@
                 <div class="column">
                     <p>Clipboard data:</p>
                     <textarea class="textarea" v-model="output_pretty" readonly></textarea>
-                    <button class="button" @click="copyRoamData(clipboard_output)">Copy</button>
+                    <button class="button" @click="copy(clipboard_output)">Copy above object as plain text</button>
+                    <button class="button" @click="copyRoamData(clipboard_output)">Copy Roam data</button>
                     <button class="button" @click="clipboard_output={}">Clear</button>
+                    <br>
                     <button class="button" @click="downloadHtml(clipboard_output)">Download .html</button>
                     <button class="button" @click="copyHtml(clipboard_output)">Copy html</button>
                     <!-- <span>Bookmarklet to drag:</span> -->
