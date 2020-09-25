@@ -224,7 +224,7 @@ document.removeEventListener("copy", l)`
                     let bookmarklet = 'javascript:' + encodeURIComponent(`;(()=>{${code}})();`)
 
                     return /*html*/ `<form action="${bookmarklet}">
-    <button>Copy code</button>
+    <button style="height:2.5em;">Copy code</button>
 </form>`
                 },
 
