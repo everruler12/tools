@@ -5,57 +5,31 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add highlights escaped from bold (Keyboard shortcut)</title>
-    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
-    <link rel="manifest" href="/site.webmanifest">
-    <!-- <script src="/assets/jquery-3.5.1.min.js"></script> -->
-    <script src="/assets/vue-2.6.12.js"></script>
-    <!-- <link rel="stylesheet" href="/assets/bulma.min.css"> -->
-    <style>
-    </style>
 </head>
 
 <body>
-    <section id="vm-app-roam-clipboard">
-        <button class="button" @click="copyRoamData(clipboard_data)">Copy code</button>
-    </section>
+    <button class="button" onclick="copyCode()">Copy code</button>
 
     <script>
-        var vm = new Vue({
-            el: "#vm-app-roam-clipboard",
-            data: {
-                clipboard_data: {
-                    "text_plain": "\n{{roam/js}}\n    ```javascript\n/*\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\nBy Erik Newhard\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\n*/\n\n;(function() {\n  let s = document.createElement('script')\n  s.src = \"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\"\n  document.head.appendChild(s)\n})();```\n\n",
-                    "text_html": "<html>\r\n<body>\r\n<!--StartFragment--><div><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span></span></span></p><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span>{{roam/js}}</span></span><div><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\">\t</span><span style=\"text-align:inherit;\"><span><pre><code>javascript\n/*\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\nBy Erik Newhard\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\n*/\n\n;(function() {\n  let s = document.createElement('script')\n  s.src = \"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\"\n  document.head.appendChild(s)\n})();</code></pre></span></span></p></div></p><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span></span></span></p></div><!--EndFragment-->\r\n</body>\r\n</html>",
-                    "roam_data": "[\"^ \",\"~:db-id\",\"roam-depot-developers\",\"~:type\",\"~:copy\",\"~:copied-data\",[[\"^ \",\"~:block/string\",\"\",\"~:children/view-type\",\"~:document\",\"~:create/email\",\"erik.newhard@gmail.com\",\"~:create/time\",1600921187513,\"~:block/uid\",\"BNNgX6o0l\",\"~:block/open\",true,\"~:edit/time\",1600924748968,\"~:edit/email\",\"erik.newhard@gmail.com\",\"~:block/order\",7],[\"^ \",\"^4\",\"{{roam/js}}\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600920980996,\"~:block/children\",[[\"^ \",\"^4\",\"~```javascript\\n/*\\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\\nBy Erik Newhard\\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\\n*/\\n\\n;(function() {\\n  let s = document.createElement('script')\\n  s.src = \\\"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\\\"\\n  document.head.appendChild(s)\\n})();```\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600921175646,\"^9\",\"f9f1BFs5H\",\"^:\",true,\"^;\",1600964872243,\"^<\",\"erik.newhard@gmail.com\",\"^=\",0]],\"^9\",\"-zI-sl2wA\",\"^:\",true,\"^;\",1600920988194,\"^<\",\"erik.newhard@gmail.com\",\"^=\",8],[\"^ \",\"^4\",\"\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600924350980,\"^9\",\"pu3Br1Ssw\",\"^:\",true,\"^;\",1600924763834,\"^<\",\"erik.newhard@gmail.com\",\"^=\",9]]]"
-                }
-            },
+        function copyCode() {
+            function listener(e) {
+                e.clipboardData.setData("text/plain", "\n{{roam/js}}\n    ```javascript\n/*\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\nBy Erik Newhard\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\n*/\n\n;(function() {\n  let s = document.createElement('script')\n  s.src = \"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\"\n  document.head.appendChild(s)\n})();```\n\n")
+                e.clipboardData.setData("text/html", "<html>\r\n<body>\r\n<!--StartFragment--><div><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span></span></span></p><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span>{{roam/js}}</span></span><div><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\">\t</span><span style=\"text-align:inherit;\"><span><pre><code>javascript\n/*\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\nBy Erik Newhard\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\n*/\n\n;(function() {\n  let s = document.createElement('script')\n  s.src = \"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\"\n  document.head.appendChild(s)\n})();</code></pre></span></span></p></div></p><p style=\"text-align:inherit;\"><span style=\"white-space:pre;\"></span><span style=\"text-align:inherit;\"><span></span></span></p></div><!--EndFragment-->\r\n</body>\r\n</html>")
+                e.clipboardData.setData("roam/data", "[\"^ \",\"~:db-id\",\"roam-depot-developers\",\"~:type\",\"~:copy\",\"~:copied-data\",[[\"^ \",\"~:block/string\",\"\",\"~:children/view-type\",\"~:document\",\"~:create/email\",\"erik.newhard@gmail.com\",\"~:create/time\",1600921187513,\"~:block/uid\",\"BNNgX6o0l\",\"~:block/open\",true,\"~:edit/time\",1600924748968,\"~:edit/email\",\"erik.newhard@gmail.com\",\"~:block/order\",7],[\"^ \",\"^4\",\"{{roam/js}}\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600920980996,\"~:block/children\",[[\"^ \",\"^4\",\"~```javascript\\n/*\\nAdd highlights escaped from bold with Ctrl/Cmd + Shift + H\\nBy Erik Newhard\\nhttps://roamresearch.com/#/app/roam-depot-developers/page/qIMQKcZh7\\n*/\\n\\n;(function() {\\n  let s = document.createElement('script')\\n  s.src = \\\"https://tools.eriknewhard.com/roam-js/add-highlights-escaped-from-bold-keyboard-shortcut.js\\\"\\n  document.head.appendChild(s)\\n})();```\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600921175646,\"^9\",\"f9f1BFs5H\",\"^:\",true,\"^;\",1600964872243,\"^<\",\"erik.newhard@gmail.com\",\"^=\",0]],\"^9\",\"-zI-sl2wA\",\"^:\",true,\"^;\",1600920988194,\"^<\",\"erik.newhard@gmail.com\",\"^=\",8],[\"^ \",\"^4\",\"\",\"^7\",\"erik.newhard@gmail.com\",\"^8\",1600924350980,\"^9\",\"pu3Br1Ssw\",\"^:\",true,\"^;\",1600924763834,\"^<\",\"erik.newhard@gmail.com\",\"^=\",9]]]")
+                e.preventDefault()
+            }
 
-            methods: {
-                copyRoamData(clipboard_data) {
-                    clipboard_data = JSON.parse(JSON.stringify(clipboard_data))
+            document.addEventListener("copy", listener)
 
-                    function listener(e) {
-                        e.clipboardData.setData("text/plain", clipboard_data.text_plain)
-                        e.clipboardData.setData("text/html", clipboard_data.text_html)
-                        e.clipboardData.setData("roam/data", clipboard_data.roam_data)
-                        e.preventDefault()
-                    }
-
-                    document.addEventListener("copy", listener)
-
-                    try {
-                        document.execCommand("copy")
-                        console.log("Copied:", clipboard_data)
-                    } catch (e) {
-                        console.log("Copy failed.", e)
-                    } finally {
-                        document.removeEventListener("copy", listener)
-                    }
-                }
-            },
-        })
+            try {
+                document.execCommand("copy")
+                console.log("Copy successful!")
+            } catch (e) {
+                console.log("Copy failed.", e)
+            } finally {
+                document.removeEventListener("copy", listener)
+            }
+        }
     </script>
 
 </body>
