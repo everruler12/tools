@@ -73,6 +73,9 @@
                 output_pretty() {
                     return JSON.stringify(this.clipboard_output, null, 2)
                 },
+                hyphenated_lowercase_name() {
+                    return this.name.toLowerCase().replace(' ', '-')
+                }
             },
 
             mounted() {
@@ -86,6 +89,7 @@
                     el.addEventListener("paste", function(e) {
                         // console.log(e.clipboardData)
                         let clipboard_data = {
+                            name: _this.name,
                             text_plain: e.clipboardData.getData("text/plain"),
                             text_html: e.clipboardData.getData("text/html"),
                             roam_data: e.clipboardData.getData("roam/data")
@@ -171,7 +175,7 @@ document.removeEventListener("copy", l)`
 </head>
 <body>
     <form action="${bookmarklet}">
-        <button>Copy code</button>
+        <button title="${this.name}">Copy code</button>
     </form>
 </body>
 </html>`
@@ -182,7 +186,7 @@ document.removeEventListener("copy", l)`
 
                     let a = $('<a>', {
                         'href': 'data:text/html;charset=utf-8,' + encodeURIComponent(html),
-                        'download': vm.name + '.html',
+                        'download': vm.hyphenated_lowercase_name + '.html',
                         'style': 'display:none;'
                     }).appendTo('body')
                     a[0].click()
