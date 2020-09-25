@@ -78,8 +78,9 @@
                     <p>Clipboard data:</p>
                     <textarea class="textarea" v-model="output_pretty" readonly></textarea>
                     <button class="button" @click="clipboard_output={}">Clear</button>
-                    <button class="button" @click="copy(clipboard_output)">Copy above object as plain text</button>
+                    <button class="button" @click="copy(output_pretty)">Copy above object as plain text</button>
                     <button class="button" @click="copyRoamData(clipboard_output)">Copy Roam data</button>
+                    <br>
                     <textarea class="textarea" v-model="clipboard_output_html" readonly></textarea>
                     <button class="button" @click="copyHtml(clipboard_output)">Copy</button>
                     <button class="button" @click="downloadHtml(clipboard_output)">Download</button>
@@ -155,7 +156,7 @@
                             _this.clipboard_input = ''
                         } else {
                             _this.clipboard_output = clipboard_data
-                            _this.clipboard_output_html = this.clipboardDataToHtml(clipboard_data)
+                            _this.clipboard_output_html = _this.clipboardDataToHtml(clipboard_data)
                         }
                     })
                 },
