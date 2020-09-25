@@ -71,6 +71,7 @@
                     <input v-model="name" placeholder="Name" @focus="$event.target.select()">
                     <!-- <textarea id="clipboard-input" class="textarea" v-model="clipboard_input" placeholder="Paste here" @focus="clipboard_input=''" @paste="clipboard_input=''"></textarea> -->
                     <textarea id="clipboard-input" class="textarea" placeholder="Paste here" @paste="clipboard_input=''"></textarea>
+                    <button class="button" @click="clipboard_input={}">Clear</button>
                 </div>
 
                 <div class="column">
@@ -79,7 +80,7 @@
                     <button class="button" @click="copyRoamData(clipboard_output)">Copy</button>
                     <button class="button" @click="clipboard_output={}">Clear</button>
                     <button class="button" @click="downloadHtml(clipboard_output)">Download .html</button>
-                    <button class="button" @click="copyHtml(clipboard_output)">Download .html</button>
+                    <button class="button" @click="copyHtml(clipboard_output)">Copy html</button>
                     <!-- <span>Bookmarklet to drag:</span> -->
                     <!-- <a class="button bookmarklet" :href="url" @click.prevent>{{name}}</a> -->
                 </div>
