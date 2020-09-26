@@ -41,7 +41,7 @@
 
         listener = function(e) {
             // Ctrl/Cmd+Shift+H to add highlights escaped from bolded section
-            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.keyCode == 72) {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.code == "KeyH" || e.keyCode == 72)) {
                 e.preventDefault()
                 e.stopImmediatePropagation()
                 let focused_textarea = $('textarea[id^="block-input"]:focus')

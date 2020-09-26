@@ -23,14 +23,14 @@
 
             listener = function(e) {
                 // Ctrl/Cmd+Shift+Up to collapse all blocks
-                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.keyCode == 38) {
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.code == 'ArrowUp' || e.keyCode == 38)) {
                     e.preventDefault()
                     $('.page-title').find('button').click() // 3-dot menu next to page title
                     $('.bp3-portal').find('.bp3-menu').find('div:contains(Collapse all)').click()
                 }
 
                 // Ctrl/Cmd+Shift+Down to expand all blocks
-                if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.keyCode == 40) {
+                if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.code == 'ArrowDown' || e.keyCode == 40)) {
                     e.preventDefault()
                     $('.page-title').find('button').click() // 3-dot menu next to page title
                     $('.bp3-portal').find('.bp3-menu').find('div:contains(Expand all)').click()
