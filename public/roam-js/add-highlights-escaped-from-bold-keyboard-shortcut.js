@@ -43,8 +43,8 @@
       // Ctrl/Cmd+Shift+H to add highlights escaped from bolded section
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.code == "KeyH" || e.keyCode == 72)) {
         e.preventDefault()
-        e.stopPropagation()
-        e.stopImmediatePropagation()
+        e.stopPropagation() // try to stop Mac from highlighting again
+        e.stopImmediatePropagation() // try to stop Mac from highlighting again
         let focused_textarea = $('textarea[id^="block-input"]:focus')
         if (focused_textarea.length)
           focused_textarea.surroundSelectedText("**^^**", "**^^**") // Rangyinputs function
