@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moon Reader Pro+ Highlights Parser</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <script src="/assets/jquery-3.5.1.min.js"></script>
+    <script src="/assets/vue-2.6.12.js"></script>
+    <link rel="stylesheet" href="/assets/bulma.min.css">
+    <style>
+        .label {
+            margin-top: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="vm-app-moonreader" class="section">
+        <div class="container">
+            <h1 class="title">Moon Reader Pro+ Highlights Parser</h1>
+            <div class="columns">
+                <div class="column">
+                    <p class="label">Input</p>
+                    <textarea class="textarea" placeholder="Paste Moon Reader .txt export here" v-model="raw"></textarea>
+                    <button class="button" @click="parse()">Parse →</button>
+                </div>
+
+                <div class="column">
+                    <p class="label">Output</p>
+                    <textarea class="textarea" v-model="output_str" readonly rows="8"></textarea>
+                    <button class="button" @click="copy(output_str)">Copy plain text</button>
+                    <button class="button" @click="downloadReadwiseCSV()">Download Readwise.csv</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        var vm = new Vue({
+            el: "#vm-app-moonreader",
+
+            data: {
+                raw: '',
+                output_str: ''
+            },
+
+            computed: {
+
+            },
+
+            mounted() {},
+
+            methods: {
+                parse() {
+                    let raw = this.raw.split('\n\n')
+
+                    if raw 
+
+                    // before '───────────────'
+                    // /\(Highlight: (\d+?); Note: (\d+?)\)$/
+                    // {
+                    // book_title: ,
+                    // book_author: ,
+                    // number_of_highlights: $1,
+                    // number_of_notes: $2
+                    // }
+                    // after '───────────────'
+
+
+
+                    raw.map(x => {
+
+                            if (x.match(/^◆/)) // chapter
+                                return x.replace(/^◆/, '###')
+                            else if (x.match(/^▪/)) { // highlight
+                                if (x.match(/\)$/)) { // ends with ) so is my note // what about a highlight ending in ) ?
+                                    c = x.split('(')
+                                    i = c.slice(-1)[0].match(/\)/g).length // count how many ending parenthesis, so doesn't cut off nested
+                                    d = c.slice(-i, c.length).join('(').replace(/\)$/, '')
+                                    e = c.slice(0, -i).join('(').trim()
+                                    x = e + '\n\n    #MW ' + d
+                                }
+
+                                return x.replace(/^▪/, '-')
+                            } else {
+                                return x
+                            }
+
+                        })
+                        .join('\n\n')
+
+                    console.log(b)
+                },
+
+
+                copy(text_to_copy) {
+                    function listener(e) {
+                        e.clipboardData.setData("text/plain", text_to_copy)
+                        e.preventDefault()
+                    }
+
+                    document.addEventListener("copy", listener)
+
+                    try {
+                        document.execCommand("copy")
+                        console.log("Copied:", text_to_copy)
+                    } catch (e) {
+                        console.log("Copy failed.", e)
+                    } finally {
+                        document.removeEventListener("copy", listener)
+                    }
+                },
+
+                downloadReadwiseCSV() {
+                    let a = $('<a>', {
+                        'href': 'data:text/csv;charset=utf-8,' + encodeURIComponent(this.output_html),
+                        'download': this.html_name,
+                        'style': 'display:none;'
+                    }).appendTo('body')
+                    a[0].click()
+                    a.remove()
+                },
+            },
+        })
+    </script>
+
+</body>
+
+</html>

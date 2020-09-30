@@ -7,6 +7,10 @@
         {
             "src": "/roam-js",
             "dest": "/roam-js/index.html"
+        },
+        {
+            "src": "/moonreader",
+            "dest": "/moonreader.html"
         }
     ]
 }
