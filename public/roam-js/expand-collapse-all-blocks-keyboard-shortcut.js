@@ -1,3 +1,4 @@
+    // 2020-09-29 Fix for new Roam update (or paid update)
     ;
     (function() {
         waitForLoad({
@@ -25,14 +26,27 @@
                 // Ctrl/Cmd+Shift+Up to collapse all blocks
                 if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.code == 'ArrowUp' || e.keyCode == 38)) {
                     e.preventDefault()
-                    $('.page-title').find('button').click() // 3-dot menu next to page title
+                    // $('.page-title').find('button').click() // 3-dot menu next to page title
+
+                    const page_title = $('.page-title')
+                    if (page_title.length)
+                        $('.page-title').find('button').click() // 3-dot menu next to page title
+                    else
+                        rightClick(document.querySelector('h1.rm-title-display')) // right-click page title
+
                     $('.bp3-portal').find('.bp3-menu').find('div:contains(Collapse all)').click()
                 }
 
                 // Ctrl/Cmd+Shift+Down to expand all blocks
                 if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.code == 'ArrowDown' || e.keyCode == 40)) {
                     e.preventDefault()
-                    $('.page-title').find('button').click() // 3-dot menu next to page title
+
+                    const page_title = $('.page-title')
+                    if (page_title.length)
+                        $('.page-title').find('button').click() // 3-dot menu next to page title
+                    else
+                        rightClick(document.querySelector('h1.rm-title-display')) // right-click page title
+
                     $('.bp3-portal').find('.bp3-menu').find('div:contains(Expand all)').click()
                 }
             }
@@ -41,6 +55,41 @@
             // console.log('Expand/collapse all blocks on page: listening for Ctrl/Cmd+Shift+Up and Ctrl/Cmd+Shift+Down')
 
             window.listeningForKeyboardShortcut_expandCollapseAllBlocks = listener
+        }
+
+        function rightClick(element) { // https://stackoverflow.com/questions/7914684/trigger-right-click-using-pure-javascript
+            var ev1 = new MouseEvent("mousedown", {
+                bubbles: true,
+                cancelable: false,
+                view: window,
+                button: 2,
+                buttons: 2,
+                clientX: element.getBoundingClientRect().x,
+                clientY: element.getBoundingClientRect().y
+            })
+            element.dispatchEvent(ev1)
+
+            var ev2 = new MouseEvent("mouseup", {
+                bubbles: true,
+                cancelable: false,
+                view: window,
+                button: 2,
+                buttons: 0,
+                clientX: element.getBoundingClientRect().x,
+                clientY: element.getBoundingClientRect().y
+            })
+            element.dispatchEvent(ev2)
+
+            var ev3 = new MouseEvent("contextmenu", {
+                bubbles: true,
+                cancelable: false,
+                view: window,
+                button: 2,
+                buttons: 0,
+                clientX: element.getBoundingClientRect().x,
+                clientY: element.getBoundingClientRect().y
+            })
+            element.dispatchEvent(ev3)
         }
 
         function appendFile(url) {
