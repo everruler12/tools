@@ -5,6 +5,11 @@ function copyHighlights(highlights) {
     const text = hl_text(highlights)
     const html = hl_html(highlights)
 
+    if (text == "") {
+        alert('No Evernote highlights detected.')
+        return
+    }
+
     function listener(e) {
         e.clipboardData.setData("text/plain", text)
         e.clipboardData.setData("text/html", html)
