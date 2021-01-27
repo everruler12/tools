@@ -22,7 +22,7 @@
             const button = Object.assign(document.createElement('div'), {
                 id: button_id,
                 className: "bp3-button bp3-minimal bp3-small bp3-icon-random",
-                title: `Random Daily Note (${randomDailyNotesList.length})`,
+                title: `Random Daily Note (0/${randomDailyNotesList.length})`,
                 style: "margin-left: 4px;",
                 onclick() { openRandomDailyNote() }
             })
@@ -72,6 +72,8 @@
 
     function openRandomDailyNote() {
         navigateToPage(randomDailyNotesList[dailyNoteIndex++])
+
+        document.getElementById(button_id).title = `Random Daily Note (${dailyNoteIndex}/${randomDailyNotesList.length})` // update queue position in tooltip
 
         if (dailyNoteIndex == randomDailyNotesList.length) {
             dailyNoteIndex = 0
