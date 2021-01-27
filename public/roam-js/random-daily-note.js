@@ -37,11 +37,30 @@
         }
     }
 
-    // list of daily notes (uids) in format mm-dd-YYYY
+    // list of daily notes
     function userDailyNotes() {
-        return roamAlphaAPI.q(`[:find (pull ?page [:block/uid :block/children]) :where [?page :node/title]]`)
-            .filter(x => x[0].uid.match(/\d\d-\d\d-\d\d\d\d/) && x[0].children) // filters daily notes that aren't blank
-            .map(x => x[0].uid)
+        return window.roamAlphaAPI.q(`[:find (pull ?page [:block/uid :block/children]) :where [?page :node/title]]`)
+            .filter(x => x[0].uid.match(/\d\d-\d\d-\d\d\d\d/)) // removes pages that aren't daily notes (uid in format mm-dd-YYYY)
+            .filter(x => x[0].children) // removes pages containing no children
+            .filter(x => {
+                if (x[0].children.length == 1) {
+                    const child_id = x[0].children[0].id
+
+                    const child_block = window.roamAlphaAPI.pull(
+                        "[:block/children, :block/string]",
+                        child_id
+                    )
+
+                    if (!child_block[':block/children'] && child_block[':block/string'] == '') {
+                        return false
+                    } else {
+                        return true
+                    }
+                } else {
+                    return true
+                }
+            }) // removes pages with one child that is blank
+            .map(x => x[0].uid) // returns only the dates
     }
 
     function shuffleArray(array) {
