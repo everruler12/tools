@@ -39,9 +39,8 @@
 
     // list of daily notes (uids) in format mm-dd-YYYY
     function userDailyNotes() {
-        return roamAlphaAPI.q(`[:find (pull ?page [:block/uid]) :where [?page :node/title]]`)
-            .map(x => x[0].uid)
-            .filter(uid => uid.match(/\d\d-\d\d-\d\d\d\d/))
+        return roamAlphaAPI.q(`[:find (pull ?page [:block/uid :block/children]) :where [?page :node/title]]`)
+            .filter(x => x[0].uid.match(/\d\d-\d\d-\d\d\d\d/) && !x[0].children)
     }
 
     function shuffleArray(array) {
