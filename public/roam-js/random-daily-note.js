@@ -45,11 +45,7 @@
             .filter(x => {
                 if (x[0].children.length == 1) {
                     const child_id = x[0].children[0].id
-
-                    const child_block = window.roamAlphaAPI.pull(
-                        "[:block/children, :block/string]",
-                        child_id
-                    )
+                    const child_block = window.roamAlphaAPI.pull("[:block/children, :block/string]", child_id)
 
                     if (!child_block[':block/children'] && child_block[':block/string'] == '') {
                         return false
