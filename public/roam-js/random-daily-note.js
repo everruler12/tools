@@ -41,6 +41,7 @@
     function userDailyNotes() {
         return roamAlphaAPI.q(`[:find (pull ?page [:block/uid :block/children]) :where [?page :node/title]]`)
             .filter(x => x[0].uid.match(/\d\d-\d\d-\d\d\d\d/) && !x[0].children)
+            .map(x => x[0].uid)
     }
 
     function shuffleArray(array) {
