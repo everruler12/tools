@@ -22,8 +22,8 @@
             const button = Object.assign(document.createElement('div'), {
                 id: button_id,
                 className: "bp3-button bp3-minimal bp3-small bp3-icon-random",
-                title: "Open random Daily Note",
-                style: "margin: 0 4px;",
+                title: `Open random Daily Note (${randomDailyNotesList.length})`,
+                style: "margin-left: 4px;",
                 onclick() { openRandomDailyNote() }
             })
 
