@@ -22,7 +22,7 @@
             const button = Object.assign(document.createElement('div'), {
                 id: button_id,
                 className: "bp3-button bp3-minimal bp3-small bp3-icon-random",
-                title: `Open random Daily Note (${randomDailyNotesList.length})`,
+                title: `Random Daily Note (${randomDailyNotesList.length})`,
                 style: "margin-left: 4px;",
                 onclick() { openRandomDailyNote() }
             })
@@ -77,8 +77,10 @@
     function openRandomDailyNote() {
         navigateToPage(randomDailyNotesList[dailyNoteIndex++])
 
-        if (dailyNoteIndex == randomDailyNotesList.length)
+        if (dailyNoteIndex == randomDailyNotesList.length) {
             dailyNoteIndex = 0
+            randomDailyNotesList = shuffleArray(userDailyNotes())
+        }
     }
 
     function navigateToPage(page_title) {
