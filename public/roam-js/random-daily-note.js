@@ -60,7 +60,7 @@
             console.log(button_id + ' loaded')
         } else {
             // wait for Roam to finish loading
-            setTimeout(addButton, 1000)
+            setTimeout(addButton, 500)
         }
     }
 
