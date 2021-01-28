@@ -9,36 +9,13 @@
     }
 
     let dailyNoteIndex = 0,
-        randomDailyNotesList = shuffleArray(userDailyNotes())
+        randomDailyNotesList = shuffleArray(userDailyNotesList())
 
     addButton()
 
 
-
-    function addButton() {
-        const topbar = document.querySelector('.roam-topbar .flex-h-box')
-
-        if (topbar) {
-            const button = Object.assign(document.createElement('div'), {
-                id: button_id,
-                className: "bp3-button bp3-minimal bp3-small bp3-icon-random",
-                title: `Random Daily Note (0/${randomDailyNotesList.length})`,
-                style: "margin-left: 4px;",
-                onclick() { openRandomDailyNote() }
-            })
-
-            // button.onclick = () => { openRandomDailyNote() }
-
-            topbar.appendChild(button)
-            console.log(button_id + ' loaded')
-        } else {
-            // wait for Roam to finish loading
-            setTimeout(addButton, 1000)
-        }
-    }
-
-    // list of daily notes
-    function userDailyNotes() {
+    // functions
+    function userDailyNotesList() {
         return window.roamAlphaAPI.q(`[:find (pull ?page [:block/uid :block/children]) :where [?page :node/title]]`)
             .filter(x => x[0].uid.match(/\d\d-\d\d-\d\d\d\d/)) // removes pages that aren't daily notes (uid in format mm-dd-YYYY)
             .filter(x => x[0].children) // removes pages containing no children
@@ -49,12 +26,9 @@
 
                     if (!child_block[':block/children'] && child_block[':block/string'] == '') {
                         return false
-                    } else {
-                        return true
                     }
-                } else {
-                    return true
                 }
+                return true
             }) // removes pages with one child that is blank
             .map(x => x[0].uid) // returns only the dates
     }
@@ -70,6 +44,26 @@
         return a
     }
 
+    function addButton() {
+        const topbar = document.querySelector('.roam-topbar .flex-h-box')
+
+        if (topbar) {
+            const button = Object.assign(document.createElement('div'), {
+                id: button_id,
+                className: "bp3-button bp3-minimal bp3-small bp3-icon-random",
+                title: `Random Daily Note (0/${randomDailyNotesList.length})`,
+                style: "margin-left: 4px;",
+                onclick() { openRandomDailyNote() }
+            })
+
+            topbar.appendChild(button)
+            console.log(button_id + ' loaded')
+        } else {
+            // wait for Roam to finish loading
+            setTimeout(addButton, 1000)
+        }
+    }
+
     function openRandomDailyNote() {
         navigateToPage(randomDailyNotesList[dailyNoteIndex++])
 
@@ -77,7 +71,7 @@
 
         if (dailyNoteIndex == randomDailyNotesList.length) {
             dailyNoteIndex = 0
-            randomDailyNotesList = shuffleArray(userDailyNotes())
+            randomDailyNotesList = shuffleArray(userDailyNotesList())
         }
     }
 
