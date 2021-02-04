@@ -45,7 +45,7 @@
     }
 
     function addButton() {
-        const topbar = document.querySelector('.roam-topbar .flex-h-box')
+        const topbar = document.querySelector('.rm-topbar')
 
         if (topbar) {
             const button = Object.assign(document.createElement('div'), {
