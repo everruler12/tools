@@ -1,4 +1,4 @@
-(function() {
+(function () {
     function getURL() {
         return document.URL
     }
@@ -20,6 +20,7 @@
         function listener(e) {
             e.clipboardData.setData("text/plain", title + '\n' + url)
             e.clipboardData.setData("text/html", `<a href="${url}">${title}</a>`)
+            e.clipboardData.setData("text/_notion-text-production", `{"editing": [["${title}",[["a","${url}"]]]],"selection": {"startIndex": 0,"endIndex": ${title.length}}}`)
             e.preventDefault()
         }
 
