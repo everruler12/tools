@@ -63,9 +63,9 @@
 
 
                     <div v-if="list.length">
-                        <button class="button" @click="fetchMetadata">Fetch ALL actual file names from Firebase API (can take several minutes)</button>
+                        <button class="button" @click="fetchMetadata">Fetch ALL missing Actual File Names from Firebase API, which can take some time ({{list.filter(a=>!a.file_name).length}} files)</button>
                         <br>
-                        <button class="button" @click="fetchMetadata('ext-only')">Fetch ONLY actual file names for &lt;none&gt; extensions from Firebase API</button>
+                        <button class="button" @click="fetchMetadata('ext-only')">Fetch ONLY Actual File Names for missing extensions from Firebase API ({{list.filter(a=>!a.file_name&&a.extension=='').length}} files)</button>
                         <br>
                     </div>
 
@@ -190,7 +190,7 @@
                     })
                 },
                 fileTypesString() {
-                    return this.countFileTypes.map(fileType => `${fileType.extension ? fileType.extension : '<none>'} (${fileType.count})`).join(', ')
+                    return this.countFileTypes.map(fileType => `${fileType.extension ? fileType.extension : '<missing>'} (${fileType.count})`).join(', ')
                 }
             },
 
