@@ -61,20 +61,24 @@
                     <p><strong>Step 4:</strong> ...</p>
                     <!-- https://chrome.google.com/webstore/detail/simple-mass-downloader/abdkkegmcbiomijcbdaodaflgehfffed/related -->
 
-                    <div v-if="fileTypes.length">File extensions: {{fileTypesString}}</div>
 
-                    <div v-if='list'>
-                        <button class="button" @click="fetchMetadata">Fetch metadata from Firebase API</button>
+                    <div v-if="list.length">
+                        <button class="button" @click="fetchMetadata">Fetch ALL actual file names from Firebase API (can take several minutes)</button>
+                        <br>
+                        <button class="button" @click="fetchMetadata('ext-only')">Fetch ONLY actual file names for &lt;none&gt; extensions from Firebase API</button>
+                        <br>
                     </div>
 
-                    <table class="table">
+                    <div v-if="fileTypes.length">File extensions: {{fileTypesString}}</div>
+
+                    <table class="table" v-if="list.length">
                         <thead>
                             <tr>
                                 <th>Page</th>
                                 <th>Download Link</th>
                                 <th>File Extension</th>
-                                <th>contentType</th>
-                                <th>file-name</th>
+                                <!-- <th>contentType</th> -->
+                                <th>Actual File Name</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,7 +86,7 @@
                                 <td><a :href="attachment.page.href" target="_blank">{{attachment.page.title}}</a></td>
                                 <td><a :href="attachment.link" target="_blank">{{attachment.link}}</a></td>
                                 <td>{{attachment.extension}}</td>
-                                <td>{{attachment.contentType}}</td>
+                                <!-- <td>{{attachment.contentType}}</td> -->
                                 <td>{{attachment.file_name}}</td>
                             </tr>
                         </tbody>
@@ -193,9 +197,7 @@
             mounted() { },
 
             methods: {
-
-
-                async fetchMetadata() {
+                async fetchMetadata(option) {
                     // detect file extension, make list of detected
                     // test with audio
                     // search for .pdf not in firebase url for external links
@@ -229,8 +231,15 @@
                         await fetchFirebaseUrl(this.list[i], i)
                     }
 
-                    async function fetchFirebaseUrl(attachment) {
-                        if (attachment.contentType) {
+                    async function fetchFirebaseUrl(attachment, i) {
+
+                        if (option == 'ext-only' && attachment.extension) {
+                            // console.log('Skipping link with known extension ', attachment.link)
+                            return
+                        }
+
+
+                        if (attachment.file_name) {
                             console.log('Already fetched ', attachment.link)
                             return
                         }
@@ -250,7 +259,7 @@
                             attachment.extension = getExtensionFromFilename(file_name)
                         }
 
-                        Vue.set(this.list, i, attachment)
+                        Vue.set(vm.list, i, attachment)
                     }
 
                 },
