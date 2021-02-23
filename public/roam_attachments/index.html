@@ -43,7 +43,7 @@
                         <br>Then extract the downloaded .zip containing the JSON file.
                     </p>
 
-                    <p><strong>Step 2:</strong> Drag the JSON file to this page, or click "Open..." below.</p>
+                    <p><strong>Step 2:</strong> Drag the JSON file to the area below, or click "Open...".</p>
 
                     <div class="file has-name is-boxed" :class="file_status">
                         <label class="file-label">
@@ -58,18 +58,29 @@
                         </label>
                     </div>
 
-                    <p><strong>Step 4:</strong> ...</p>
+                    <p><strong>Step 3:</strong> ...</p>
                     <!-- https://chrome.google.com/webstore/detail/simple-mass-downloader/abdkkegmcbiomijcbdaodaflgehfffed/related -->
 
 
                     <div v-if="list.length">
-                        <button class="button" @click="fetchMetadata">Fetch ALL missing Actual File Names from Firebase API, which can take some time ({{list.filter(a=>!a.file_name).length}} files)</button>
+                        <!-- <button class="button" @click="fetchMetadata('missing-all')">Fetch ALL missing Actual File Names from Firebase API, which can take some time ({{list.filter(a=>!a.file_name).length}} files)</button>
+                        <br> -->
+                        <button class="button" @click="fetchMetadata('missing-names')">Fetch ALL missing Actual File Names from Firebase API, which can take some time ({{list.filter(a=>!a.file_name).length}} files)</button>
                         <br>
-                        <button class="button" @click="fetchMetadata('ext-only')">Fetch ONLY Actual File Names for missing extensions from Firebase API ({{list.filter(a=>!a.file_name&&a.extension=='').length}} files)</button>
+                        <button class="button" @click="fetchMetadata('missing-ext')">Fetch ONLY Actual File Names for missing extensions from Firebase API ({{list.filter(a=>!a.file_name&&a.extension=='').length}} files)</button>
+                        <br>
                         <br>
                     </div>
 
                     <div v-if="fileTypes.length">File extensions: {{fileTypesString}}</div>
+
+                    <div>
+                        <br>
+                        <label class="checkbox"> <input type="checkbox" v-model="smdOutput">Output for Simple Mass Downloader<a v-if="!smdOutput" href="https://chrome.google.com/webstore/detail/simple-mass-downloader/abdkkegmcbiomijcbdaodaflgehfffed/">*</a></label>
+                        <br>
+                        <br>
+                        <!-- check SMD output, fetch page links, select Docs, rename with mask {text}, uncheck "Ask to save" -->
+                    </div>
 
                     <table class="table" v-if="list.length">
                         <thead>
@@ -83,8 +94,14 @@
                         </thead>
                         <tbody>
                             <tr v-for="attachment in list">
-                                <td><a :href="attachment.page.href" target="_blank">{{attachment.page.title}}</a></td>
-                                <td><a :href="attachment.link" target="_blank">{{attachment.link}}</a></td>
+                                <td>
+                                    <a v-if="!smdOutput" :href="attachment.page.href" target="_blank">{{attachment.page.title}}</a>
+                                    <span v-if="smdOutput">{{attachment.page.title}}</span>
+                                </td>
+                                <td>
+                                    <a v-if="!smdOutput || !attachment.file_name" :href="attachment.link" target="_blank">{{attachment.link}}</a>
+                                    <a v-if="smdOutput && attachment.file_name" :href="attachment.link" target="_blank">{{attachment.file_name}}</a>
+                                </td>
                                 <td>{{attachment.extension}}</td>
                                 <!-- <td>{{attachment.contentType}}</td> -->
                                 <td>{{attachment.file_name}}</td>
@@ -138,6 +155,9 @@
         // TODO load from last session (to save query, and in case of timeout, don't requery if already got contentType)
         // TODO add search bar to filter by page name or filename
         // TODO allow export/import of ignoreList.txt with links to be ignored (filtered out with checkbox, and when shown, marked with red circle with line symbol)
+        // instead of ingore list, export full session data, with already got metadata, and marked as already downloaded, or ignored
+        // add editable text input with graph name, based on uploaded .json
+        // "load last session" button if localStorage detected (grayed out if not)
 
         // final output, i want to be a table with following columns:
         // - page title (as link to Roam page, to make it easy to check)
@@ -166,7 +186,8 @@
                 file_status: '',
                 file_label: 'Open a JSON file...',
                 file_name: '',
-                list: []
+                list: [],
+                smdOutput: false,
 
                 // file_txt: '',
                 // file_mrexpt: '',
@@ -233,7 +254,7 @@
 
                     async function fetchFirebaseUrl(attachment, i) {
 
-                        if (option == 'ext-only' && attachment.extension) {
+                        if (option == 'missing-ext' && attachment.extension) {
                             // console.log('Skipping link with known extension ', attachment.link)
                             return
                         }
