@@ -9,15 +9,13 @@ async function init() {
             if (!window.Papa) $.getScript('https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js')
 
             const spaceHref = getSpaceHref()
-            const memberTotal = getmemberTotal()
 
             log(`Loading members in ${spaceHref}`)
 
             const pagesData = await fetchMembersPages(spaceHref, 1)
             let membersList = getMembersList(pagesData)
 
-            if (membersList.length != memberTotal)
-                log(`Error: member count mismatch\n`, { memberTotal, fetchedCount: membersList.length })
+            log(`Found ${membersList.length} members`)
 
             await Promise.all(membersList.map(async member => await fetchMemberProfile(member))).then(result => membersList = result)
 
@@ -210,17 +208,6 @@ function getSpaceHref() {
 
     } else {
         log(`Error: unsupported space href ${href}`)
-    }
-}
-
-function getmemberTotal() {
-    const el = $('.header__nav > .nav-link:contains(Members) > .nav-link__count')
-
-    if (el.length) {
-        return Number(el.eq(0).text().trim())
-
-    } else {
-        log(`Error: cannot find member count`)
     }
 }
 
