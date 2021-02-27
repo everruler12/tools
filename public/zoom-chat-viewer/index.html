@@ -13,10 +13,6 @@
     <script src="./assets/vue-2.6.12.js"></script>
     <link rel="stylesheet" href="./assets/bulma.min.css">
     <style>
-        .warning {
-            color: red
-        }
-
         p {
             margin: 1em 0;
         }
@@ -90,7 +86,6 @@
         }
 
         function determineChatType(line) {
-            // TODO handle multiline messages
 
             // 12:58:22	Erik Newhard:	<message>
             if (line.split('\t').length == 3) // chat.txt // full session, public chat
@@ -173,7 +168,7 @@
 
                     let lines = txt.trim().split('\n')
 
-                    const chatType = determineChatType(lines[0]) // possible: ['public', 'private', 'unknown']
+                    const chatType = determineChatType(lines[0]) // ['public', 'private', 'publicOld', 'unknown']
                     this.chatType = chatType
 
                     lines = fixMultiline(lines, chatType)
@@ -204,49 +199,21 @@
                     reader.readAsText(file)
 
                     function loadData(event) {
-                        // console.log(file.name)
-                        // console.log(data)
                         _this.file_name = file.name
 
-                        // const allowed_extensions = ['txt']
-
-                        // const reg_exp = new RegExp(allowed_extensions.map(ext => `(\.${ext})`).join('|'))
-                        // const match = file.name.match(reg_exp)
                         const ext = getExtensionFromFilename(file.name)
 
                         if (ext == '.txt') {
-                            // const ext = match[0]
                             const data = event.target.result
 
                             _this.file_status = "is-success"
                             _this.file_label = `${ext} file loaded!`
 
-                            // if (ext == '.txt')
                             _this.parseData(data)
-                            // else if (ext = 'json')
-                            // _this.parseData(JSON.parse(data))
                         } else {
                             _this.file_status = "is-danger"
                             _this.file_label = `${ext} is not a supported file extension. Please try again`
                         }
-                    }
-                },
-
-                copy(text_to_copy) {
-                    function listener(e) {
-                        e.clipboardData.setData("text/plain", text_to_copy)
-                        e.preventDefault()
-                    }
-
-                    document.addEventListener("copy", listener)
-
-                    try {
-                        document.execCommand("copy")
-                        console.log("Copied:", text_to_copy)
-                    } catch (e) {
-                        console.log("Copy failed.", e)
-                    } finally {
-                        document.removeEventListener("copy", listener)
                     }
                 },
             },
