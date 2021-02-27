@@ -67,7 +67,7 @@
                                 <td>{{chat.timestamp}}</td>
                                 <td>{{chat.from}}</td>
                                 <td v-if="chatType == 'private'">{{chat.to}}</td>
-                                <td style="white-space: pre;">{{chat.message}} </td>
+                                <td style="white-space: pre;">{{chat.message}}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -78,7 +78,7 @@
 
     <script>
         const privateChatLineRegex = /^(\d\d:\d\d:\d\d) From  (.*?)  to  (.*?) : ([\s\S]+)/
-        // const privateChatLineRegex = /^(\d\d:\d\d:\d\d) From  (.*?)  to  (.*?) : (.*?)$/
+        const publicChatOldRegex = /^(\d\d:\d\d:\d\d)\t From  (.*?) : ([\s\S]+)/
 
         function getExtensionFromFilename(fileName) {
             const extensionMatch = fileName.match(/\.(\w+)$/)
@@ -93,9 +93,13 @@
                 return 'public'
 
             // 12:58:22 From  Erik Newhard  to  Everyone : <message>
-            else if (line.match(privateChatLineRegex)) // meeting_saved_chat.txt // personally saved filed
+            else if (line.match(privateChatLineRegex)) // meeting_saved_chat.txt // personally saved file
                 // what if user name contains '  to  ' or ' : '?
                 return 'private'
+
+            // 12:58:22	 From  Erik Newhard : <message>
+            else if (line.match(publicChatOldRegex)) // meeting_saved_chat.txt // automatically saved file, old
+                return 'publicOld'
 
             else
                 return 'unknown'
@@ -120,10 +124,20 @@
             }
         }
 
+        function parsePublicOldChat(line, i) {
+            const l = line.match(publicChatOldRegex)
+            return {
+                timestamp: l[1],
+                from: l[2],
+                message: l[3]
+            }
+        }
+
         function fixMultiline(lines, chatType) {
             for (let i = 0; i < lines.length; i++) {
                 if ((chatType == 'public' && lines[i].split('\t').length != 3) ||
-                    (chatType == 'private' && !lines[i].match(privateChatLineRegex))
+                    (chatType == 'private' && !lines[i].match(privateChatLineRegex)) ||
+                    (chatType == 'publicOld' && !lines[i].match(publicChatOldRegex))
                 ) {
                     lines[i - 1] += '\n' + lines[i]
                     lines.splice(i, 1)
@@ -153,7 +167,7 @@
 
                 parseData(txt) {
 
-                    let lines = txt.split('\n')
+                    let lines = txt.trim().split('\n')
 
                     const chatType = determineChatType(lines[0]) // possible: ['public', 'private', 'unknown']
                     this.chatType = chatType
@@ -166,8 +180,11 @@
                     else if (chatType == 'private')
                         this.list = lines.map(parsePrivateChat)
 
+                    if (chatType == 'publicOld')
+                        this.list = lines.map(parsePublicOldChat)
+
                     else if (chatType == 'unknown')
-                        console.log('Error: unknown chat type', lines[0])
+                        console.log(`Error: Can't determine chat type from\n`, lines[0])
 
                 },
 
