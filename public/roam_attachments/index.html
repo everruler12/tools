@@ -320,7 +320,10 @@
                     list.map(page => page.attachments.map(attachment => arr.push({ link: attachment.link, extension: attachment.extension, page: { title: page.title, href: page.href } })))
                     console.log(arr)
 
+
+
                     this.list = arr
+                        .filter(attachment => attachment.extension == '.pdf') // temporary line of code
                 },
 
                 addFile(e) {
