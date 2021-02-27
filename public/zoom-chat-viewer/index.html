@@ -67,7 +67,7 @@
                                 <td>{{chat.timestamp}}</td>
                                 <td>{{chat.from}}</td>
                                 <td v-if="chatType == 'private'">{{chat.to}}</td>
-                                <td>{{chat.message}}</td>
+                                <td style="white-space: pre;">{{chat.message}} </td>
                             </tr>
                         </tbody>
                     </table>
@@ -77,6 +77,8 @@
     </section>
 
     <script>
+        const privateChatLineRegex = /^(\d\d:\d\d:\d\d) From  (.*?)  to  (.*?) : ([\s\S]+)/
+        // const privateChatLineRegex = /^(\d\d:\d\d:\d\d) From  (.*?)  to  (.*?) : (.*?)$/
 
         function getExtensionFromFilename(fileName) {
             const extensionMatch = fileName.match(/\.(\w+)$/)
@@ -84,14 +86,16 @@
         }
 
         function determineChatType(line) {
+            // TODO handle multiline messages
 
+            // 12:58:22	Erik Newhard:	<message>
             if (line.split('\t').length == 3) // chat.txt // full session, public chat
                 return 'public'
 
-            // 12:58:22 From  Erik Newhard  to  Everyone : 
-            else if (line.match(/^\d\d:\d\d:\d\d: From  (.*?)  to  (.*?) : (.*?)^/)) // meeting_saved_chat.txt // personally saved filed
+            // 12:58:22 From  Erik Newhard  to  Everyone : <message>
+            else if (line.match(privateChatLineRegex)) // meeting_saved_chat.txt // personally saved filed
                 // what if user name contains '  to  ' or ' : '?
-                return 'public'
+                return 'private'
 
             else
                 return 'unknown'
@@ -106,13 +110,27 @@
             }
         }
 
-        function parsePrivateChat(line) {
-            const l = line.split('\t')
+        function parsePrivateChat(line, i) {
+            const l = line.match(privateChatLineRegex)
             return {
-                timestamp: l[0],
-                from: l[1],
-                message: l[2]
+                timestamp: l[1],
+                from: l[2],
+                to: l[3],
+                message: l[4]
             }
+        }
+
+        function fixMultiline(lines, chatType) {
+            for (let i = 0; i < lines.length; i++) {
+                if ((chatType == 'public' && lines[i].split('\t').length != 3) ||
+                    (chatType == 'private' && !lines[i].match(privateChatLineRegex))
+                ) {
+                    lines[i - 1] += '\n' + lines[i]
+                    lines.splice(i, 1)
+                    i--
+                }
+            }
+            return lines
         }
 
         var vm = new Vue({
@@ -135,19 +153,21 @@
 
                 parseData(txt) {
 
-                    const lines = txt.split('\n')
+                    let lines = txt.split('\n')
 
                     const chatType = determineChatType(lines[0]) // possible: ['public', 'private', 'unknown']
                     this.chatType = chatType
 
-                    if (chatType = 'public')
+                    lines = fixMultiline(lines, chatType)
+
+                    if (chatType == 'public')
                         this.list = lines.map(parsePublicChat)
 
-                    else if (chatType = 'private')
+                    else if (chatType == 'private')
                         this.list = lines.map(parsePrivateChat)
 
-                    else if (chatType = 'unknown')
-                        return
+                    else if (chatType == 'unknown')
+                        console.log('Error: unknown chat type', lines[0])
 
                 },
 
