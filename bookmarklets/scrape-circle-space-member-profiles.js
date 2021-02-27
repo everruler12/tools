@@ -247,7 +247,7 @@ function log(...messages) {
 
 function getTitle() {
     // $('.title-name').text().trim() // doesn't work when on a post page
-    const date = new Date().toISOString().replace('T', '_').replace(/:\d\d\.\d\d\dZ/, '').replace(':', '-')
+    const date = new Date().toISOString().replace('T', ' ').replace(/:\d\d\.\d\d\dZ/, '').replace(':', '-')
     const title = document.title.replace(/(\(\d+?\) )?(.+?) \| (.+?)$/, '$3 - $2') // '(1) Course Directory | Write of Passage' -> 'Write of Passage - Course Directory'
     return `${title} ymembers (${date})`
 }
