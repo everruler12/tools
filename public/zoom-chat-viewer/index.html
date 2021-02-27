@@ -28,6 +28,10 @@
         .file-name {
             max-width: initial;
         }
+
+        .preWrap {
+            white-space: pre-wrap;
+        }
     </style>
 </head>
 
@@ -67,7 +71,7 @@
                                 <td>{{chat.timestamp}}</td>
                                 <td>{{chat.from}}</td>
                                 <td v-if="chatType == 'private'">{{chat.to}}</td>
-                                <td style="white-space: pre;">{{chat.message}}</td>
+                                <td class="preWrap">{{chat.message}}</td>
                             </tr>
                         </tbody>
                     </table>
