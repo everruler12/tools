@@ -44,7 +44,7 @@
                             <br>Then extract the downloaded .zip containing the JSON file.
                         </p>
 
-                        <p><strong>Step 2:</strong> Drag the JSON file to the area below, or click "Open...".</p>
+                        <p><strong>Step 2:</strong> Click "Open..." or drag the JSON file here:</p>
 
                         <div class="file has-name is-boxed" :class="file_status">
                             <label class="file-label">
@@ -60,7 +60,7 @@
                         </div>
 
                         <div v-if="list.length">
-                            <p><strong>Step 3:</strong> Fetch actual file names from firebase metadata</p>
+                            <p><strong>Step 3:</strong> Fetch actual file names from firebase metadata:</p>
                             <!-- https://chrome.google.com/webstore/detail/simple-mass-downloader/abdkkegmcbiomijcbdaodaflgehfffed/related -->
 
 
@@ -76,7 +76,7 @@
 
                             <div v-if="fileTypes.length">File extensions: {{fileTypesString}}</div>
 
-                            <p><strong>Step 4:</strong> Download the listed files from firebase</p>
+                            <p><strong>Step 4:</strong> Download the listed files from firebase:</p>
 
                             <ul>
                                 <li>Install the <span v-if="smdOutput">Simple Mass Downloader</span><a v-if="!smdOutput" href="https://chrome.google.com/webstore/detail/simple-mass-downloader/abdkkegmcbiomijcbdaodaflgehfffed/">Simple Mass Downloader</a> extension</li>
