@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Roam Attachments Extractor</title>
+    <title>Roam Attachments Lister</title>
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
     <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
@@ -34,80 +34,102 @@
 <body>
     <section id="vm-app" class="section" v-cloak @drop.prevent="addFile" @dragover.prevent>
         <div class="container">
-            <h1 class="title">Roam Attachments Extractor</h1>
+            <h1 class="title">Roam Attachments Lister</h1>
             <div class="columns">
                 <div class="column">
+                    <div class="content">
 
-                    <p><strong>Step 1:</strong> Go to Roam and save JSON export.
-                        <br>(click "..." menu in upper right > Export All option > select JSON for Export Format > Export All button)
-                        <br>Then extract the downloaded .zip containing the JSON file.
-                    </p>
+                        <p><strong>Step 1:</strong> Go to Roam and save JSON export.
+                            <br>(click "..." menu in upper right > Export All option > select JSON for Export Format > Export All button)
+                            <br>Then extract the downloaded .zip containing the JSON file.
+                        </p>
 
-                    <p><strong>Step 2:</strong> Drag the JSON file to the area below, or click "Open...".</p>
+                        <p><strong>Step 2:</strong> Drag the JSON file to the area below, or click "Open...".</p>
 
-                    <div class="file has-name is-boxed" :class="file_status">
-                        <label class="file-label">
-                            <input class="file-input" type="file" name="json_file">
-                            <span class="file-cta">
-                                <span class="file-icon">
-                                    <i class="fas fa-upload"></i>
+                        <div class="file has-name is-boxed" :class="file_status">
+                            <label class="file-label">
+                                <input class="file-input" type="file" name="json_file">
+                                <span class="file-cta">
+                                    <span class="file-icon">
+                                        <i class="fas fa-upload"></i>
+                                    </span>
+                                    <span class="file-label">{{file_label}}</span>
                                 </span>
-                                <span class="file-label">{{file_label}}</span>
-                            </span>
-                            <span class="file-name">{{file_name}}</span>
-                        </label>
-                    </div>
+                                <span class="file-name">{{file_name}}</span>
+                            </label>
+                        </div>
 
-                    <p><strong>Step 3:</strong> ...</p>
-                    <!-- https://chrome.google.com/webstore/detail/simple-mass-downloader/abdkkegmcbiomijcbdaodaflgehfffed/related -->
+                        <div v-if="list.length">
+                            <p><strong>Step 3:</strong> Fetch actual file names from firebase metadata</p>
+                            <!-- https://chrome.google.com/webstore/detail/simple-mass-downloader/abdkkegmcbiomijcbdaodaflgehfffed/related -->
 
 
-                    <div v-if="list.length">
-                        <!-- <button class="button" @click="fetchMetadata('missing-all')">Fetch ALL missing Actual File Names from Firebase API, which can take some time ({{list.filter(a=>!a.file_name).length}} files)</button>
+                            <div>
+                                <!-- <button class="button" @click="fetchMetadata('missing-all')">Fetch ALL missing Actual File Names from Firebase API, which can take some time ({{list.filter(a=>!a.file_name).length}} files)</button>
                         <br> -->
-                        <button class="button" @click="fetchMetadata('missing-names')">Fetch ALL missing Actual File Names from Firebase API, which can take some time ({{list.filter(a=>!a.file_name).length}} files)</button>
-                        <br>
-                        <button class="button" @click="fetchMetadata('missing-ext')">Fetch ONLY Actual File Names for missing extensions from Firebase API ({{list.filter(a=>!a.file_name&&a.extension=='').length}} files)</button>
-                        <br>
-                        <br>
+                                <button class="button" @click="fetchMetadata('missing-names')">Fetch ALL missing Actual File Names from Firebase API ({{list.filter(a=>!a.file_name).length}} files)</button>
+                                <br>
+                                <!-- <button class="button" @click="fetchMetadata('missing-ext')">Fetch ONLY Actual File Names for missing extensions from Firebase API ({{list.filter(a=>!a.file_name&&a.extension=='').length}} files)</button>
+                                <br>
+                                <br> -->
+                            </div>
+
+                            <div v-if="fileTypes.length">File extensions: {{fileTypesString}}</div>
+
+                            <p><strong>Step 4:</strong> Download the listed files from firebase</p>
+
+                            <ul>
+                                <li>Install the <span v-if="smdOutput">Simple Mass Downloader</span><a v-if="!smdOutput" href="https://chrome.google.com/webstore/detail/simple-mass-downloader/abdkkegmcbiomijcbdaodaflgehfffed/">Simple Mass Downloader</a> extension</li>
+                                <li>Set download directory in Chrome's settings (suggested to be different than the default)</li>
+                                <li>Make sure "Ask where to save each file before downloading" is toggled off in Chrome settings</li>
+                                <li>check "Prepare links for SMD" to remove non-firebase file links from this page, and set the text of firebase file links to the actual file name (to be used with {text} mask)</li>
+                            </ul>
+
+                            <label class="checkbox"><input type="checkbox" v-model="smdOutput"> Prepare links for SMD</label>
+
+                            <ul>
+                                <li>click SMD extension icon</li>
+                                <li>click Load Page Links</li>
+                                <li>check all items</li>
+                                <li>add to passive queue (plus button in lower-right)</li>
+                                <li>go to Download List</li>
+                                <li>with all selected, click Multirename in lower-left</li>
+                                <li>in top input "Set mask for selected files", type in: {text}</li>
+                                <li>click Confirm</li>
+                                <li>click "Start selected" to download</li>
+                            </ul>
+                            <br>
+                            <br>
+                            <!-- check SMD output, fetch page links, select Docs, rename with mask {text}, uncheck "Ask to save" -->
+                        </div>
+
+                        <table class="table" v-if="list.length">
+                            <thead>
+                                <tr>
+                                    <th>Page</th>
+                                    <th>Download Link</th>
+                                    <th>File Extension</th>
+                                    <!-- <th>contentType</th> -->
+                                    <th>Actual File Name</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="attachment in list">
+                                    <td>
+                                        <a v-if="!smdOutput" :href="attachment.page.href" target="_blank">{{attachment.page.title}}</a>
+                                        <span v-if="smdOutput">{{attachment.page.title}}</span>
+                                    </td>
+                                    <td>
+                                        <a v-if="!smdOutput || !attachment.file_name" :href="attachment.link" target="_blank">{{attachment.link}}</a>
+                                        <a v-if="smdOutput && attachment.file_name" :href="attachment.link" target="_blank">{{attachment.file_name}}</a>
+                                    </td>
+                                    <td>{{attachment.extension}}</td>
+                                    <!-- <td>{{attachment.contentType}}</td> -->
+                                    <td>{{attachment.file_name}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
-
-                    <div v-if="fileTypes.length">File extensions: {{fileTypesString}}</div>
-
-                    <div>
-                        <br>
-                        <label class="checkbox"> <input type="checkbox" v-model="smdOutput">Output for Simple Mass Downloader<a v-if="!smdOutput" href="https://chrome.google.com/webstore/detail/simple-mass-downloader/abdkkegmcbiomijcbdaodaflgehfffed/">*</a></label>
-                        <br>
-                        <br>
-                        <!-- check SMD output, fetch page links, select Docs, rename with mask {text}, uncheck "Ask to save" -->
-                    </div>
-
-                    <table class="table" v-if="list.length">
-                        <thead>
-                            <tr>
-                                <th>Page</th>
-                                <th>Download Link</th>
-                                <th>File Extension</th>
-                                <!-- <th>contentType</th> -->
-                                <th>Actual File Name</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="attachment in list">
-                                <td>
-                                    <a v-if="!smdOutput" :href="attachment.page.href" target="_blank">{{attachment.page.title}}</a>
-                                    <span v-if="smdOutput">{{attachment.page.title}}</span>
-                                </td>
-                                <td>
-                                    <a v-if="!smdOutput || !attachment.file_name" :href="attachment.link" target="_blank">{{attachment.link}}</a>
-                                    <a v-if="smdOutput && attachment.file_name" :href="attachment.link" target="_blank">{{attachment.file_name}}</a>
-                                </td>
-                                <td>{{attachment.extension}}</td>
-                                <!-- <td>{{attachment.contentType}}</td> -->
-                                <td>{{attachment.file_name}}</td>
-                            </tr>
-                        </tbody>
-                    </table>
 
                     <p><strong>Privacy note:</strong> The JSON data is only loaded within your browser and not sent to any servers. This script works offline, except for when querying the firebase storage for previews, actual file type, and actual file name.</p>
 
@@ -148,6 +170,7 @@
 
                 </div> -->
             </div>
+        </div>
         </div>
     </section>
 
@@ -248,9 +271,12 @@
 
                     // Vue.set(this.list, 0, list[0])
 
-                    for (let i = 0; i < this.list.length; i++) {
-                        await fetchFirebaseUrl(this.list[i], i)
-                    }
+
+
+                    // for (let i = 0; i < this.list.length; i++) {
+                    //     await fetchFirebaseUrl(this.list[i], i)
+                    // }
+                    await Promise.all(this.list.map(fetchFirebaseUrl))
 
                     async function fetchFirebaseUrl(attachment, i) {
 
@@ -323,7 +349,7 @@
 
 
                     this.list = arr
-                        .filter(attachment => attachment.extension == '.pdf') // temporary line of code
+                    // .filter(attachment => attachment.extension == '.pdf') // temporary line of code
                 },
 
                 addFile(e) {
