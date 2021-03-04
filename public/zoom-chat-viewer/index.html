@@ -11,6 +11,9 @@
     <link rel="manifest" href="/site.webmanifest">
     <script src="./assets/jquery-3.5.1.min.js"></script>
     <script src="./assets/vue-2.6.12.js"></script>
+    <script src="./assets/linkify-2.1.8.min.js"></script>
+    <script src="./assets/linkify-html-2.1.8.min.js"></script>
+    <!-- <script src="./assets/linkify-jquery-2.1.8.min.js"></script> -->
     <link rel="stylesheet" href="./assets/bulma.min.css">
     <style>
         p {
@@ -25,8 +28,36 @@
             max-width: initial;
         }
 
-        .preWrap {
+        .prewrap {
             white-space: pre-wrap;
+            word-break: break-word;
+        }
+
+        .pointer {
+            cursor: pointer;
+        }
+
+        .gray {
+            color: lightgrey !important;
+        }
+
+        table {
+            border-collapse: separate;
+        }
+
+        .sticky {
+            position: sticky;
+            top: 0;
+            background: white;
+            border-bottom: 2px solid #dbdbdb;
+        }
+
+        a:hover {
+            color: #81a9ea;
+        }
+
+        .nowrap {
+            white-space: nowrap;
         }
     </style>
 </head>
@@ -53,21 +84,26 @@
                         </label>
                     </div>
 
-                    <table class="table" v-if="list.length">
+                    <p class="has-text-grey-light is-size-7 is-italic" v-if="list.length">Clicking a header hides/shows that column.
+                        <!-- <br>Hovering over field makes a "copy" button appear. -->
+                    </p>
+
+                    <table class="table is-hoverable" v-if="list.length">
                         <thead>
                             <tr>
-                                <th>Timestamp</th>
-                                <th>From</th>
-                                <th v-if="chatType == 'private'">To</th>
-                                <th>Message</th>
+                                <!-- TODO turn this into template component -->
+                                <th class="pointer sticky" :class="{'has-text-grey-light': !showFields.timestamp, 'is-size-7': !showFields.timestamp}" @click="showFields.timestamp = !showFields.timestamp">Time</th>
+                                <th class="pointer sticky" :class="{'has-text-grey-light': !showFields.from, 'is-size-7': !showFields.from}" @click="showFields.from = !showFields.from">From</th>
+                                <th class="pointer sticky" :class="{'has-text-grey-light': !showFields.to, 'is-size-7': !showFields.to}" @click="showFields.to = !showFields.to" v-if="chatType == 'private'">To</th>
+                                <th class="pointer sticky" :class="{'has-text-grey-light': !showFields.message, 'is-size-7': !showFields.message}" @click="showFields.message = !showFields.message">Message</th>
                             </tr>
                         </thead>
                         <tbody>
                             <tr v-for="chat in list">
-                                <td>{{chat.timestamp}}</td>
-                                <td>{{chat.from}}</td>
-                                <td v-if="chatType == 'private'">{{chat.to}}</td>
-                                <td class="preWrap">{{chat.message}}</td>
+                                <td><span v-show="showFields.timestamp">{{chat.timestamp}}</span></td>
+                                <td><span v-show="showFields.from" v-html="nowrp2wrds(chat.from)"></span></td>
+                                <td><span v-if="chatType == 'private' && showFields.to" v-html="nowrp2wrds(nowrpDm(chat.to))"></span></td>
+                                <td><span v-show="showFields.message" class="prewrap" v-html="lnkfy(chat.message)"></span></td>
                             </tr>
                         </tbody>
                     </table>
@@ -155,9 +191,36 @@
                 file_name: '',
                 list: [],
                 chatType: '',
+                showFields: {
+                    timestamp: true,
+                    from: true,
+                    to: true,
+                    message: true
+                }
             },
 
             methods: {
+                lnkfy(text) {
+                    return linkifyHtml(text, {
+                        defaultProtocol: 'https',
+                        target: "_blank"
+                    })
+                },
+
+                nowrp2wrds(text) {
+                    const split_text = text.split(' ')
+
+                    if (split_text.length > 2)
+                        return `${split_text[0]}&nbsp;${split_text[1]} ${split_text.slice(2).join(' ')}`
+                    // return `<span class="nowrap">${split_text[0]} ${split_text[1]}</span> ${split_text.slice(2).join(' ')}`
+                    else
+                        return `<span class="nowrap">${text}</span>`
+                },
+
+                nowrpDm(text) {
+                    return text.replace(/(\(Direct Message\))$/, ` (Direct&nbsp;Message)`) // to make cleaner when 'To' is a direct message
+                    // return text.replace(/(\(Direct Message\))$/, ` <span class="nowrap">$1</span>`) // to make cleaner when 'To' is a direct message
+                },
 
                 parseData(txt) {
 
