@@ -85,7 +85,7 @@
                     </div>
 
                     <p class="has-text-grey-light is-size-7 is-italic" v-if="list.length">Clicking a header hides/shows that column.
-                        <!-- TODO: -->
+                        <!-- TODO:zoom -->
                         <!-- <br>Hovering over field makes a "copy" button appear. -->
                     </p>
 
@@ -103,7 +103,7 @@
                             <tr v-for="chat in list">
                                 <td><span v-show="showFields.timestamp">{{chat.timestamp}}</span></td>
                                 <td><span v-show="showFields.from" v-html="nowrp2wrds(chat.from)"></span></td>
-                                <td><span v-if="chatType == 'private' && showFields.to" v-html="nowrp2wrds(nowrpDm(chat.to))"></span></td>
+                                <td v-if="chatType == 'private'"><span v-if="showFields.to" v-html="nowrp2wrds(nowrpDm(chat.to))"></span></td>
                                 <td><span v-show="showFields.message" class="prewrap" v-html="lnkfy(chat.message)"></span></td>
                             </tr>
                         </tbody>
