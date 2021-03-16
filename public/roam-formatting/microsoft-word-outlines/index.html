@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microsoft Word Outlines to Roam Format</title>
+
+    <!-- <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <script src="/assets/jquery-3.5.1.min.js"></script>
+    <script src="/assets/vue-2.6.12.js"></script>
+    <link rel="stylesheet" href="/assets/bulma.min.css"> -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.4.16/mammoth.browser.min.js"></script>
+    <script src="https://unpkg.com/turndown/dist/turndown.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css">
+    <style>
+        .label {
+            margin-top: 0.5em;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="vm-app" class="section" v-cloak @drop.prevent="addFile" @dragover.prevent>
+        <div class="container">
+            <h1 class="title">Microsoft Word Outlines to Roam Format</h1>
+
+            <div class="columns">
+
+                <div class="column">
+                    <p>Drag Microsoft Word file to area below, or click Open to browse.</p>
+                    <br>
+
+                    <div class="file has-name is-boxed" :class="file_status">
+                        <label class="file-label">
+                            <input class="file-input" type="file" name="json_file">
+                            <span class="file-cta">
+                                <span class="file-icon">
+                                    <i class="fas fa-upload"></i>
+                                </span>
+                                <span class="file-label">{{file_label}}</span>
+                            </span>
+                            <span class="file-name">{{file_name}}</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <textarea id="clipboard-input" class="textarea" placeholder="Paste copied Word text here" readonly @paste="onPaste"></textarea>
+                    </div>
+                    <div v-html="html"></div>
+                </div>
+
+                <div class="column">
+                    <p class="label">Output</p>
+                    <textarea class="textarea" v-model="markdown" readonly rows="8"></textarea>
+                    <button class="button" @click="copy(markdown)">Copy</button>
+
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // TODO: if no roamdata, convert script as plain text into roam data
+        var vm = new Vue({
+            el: "#vm-app",
+
+            data: {
+                file_status: '',
+                file_label: 'Open a DOCX file...',
+                file_name: '',
+                markdown: '',
+                html: ''
+            },
+
+            computed: {},
+
+            mounted() { },
+
+            methods: {
+                onPaste(e) {
+                    const html = e.clipboardData.getData("text/html")
+
+                    if (html == "") {
+                        alert("No useable data in that paste")
+                        return
+                    }
+
+                    // remove <style>
+                    // remove 'mso-list:Ignore'
+                    // convert mso-list: ... level2 ... to <li>, and wrap each with <ul>
+
+                    this.html = html
+                    this.convertHtmlToMd(html)
+                },
+
+                addFile(e) {
+                    let file = e.dataTransfer.files[0]
+
+                    if (!file) return
+
+                    let _this = this
+
+                    const reader = new FileReader()
+                    reader.onloadend = loadData
+                    reader.readAsArrayBuffer(file)
+
+                    function loadData(event) {
+                        // console.log(file.name)
+                        // console.log(data)
+                        _this.file_name = file.name
+
+                        if (file.name.match(/\.docx$/)) {
+                            const data = event.target.result
+
+                            _this.file_status = "is-success"
+                            _this.file_label = 'DOCX loaded!'
+                            _this.convertDocxToHtml(data)
+                        } else {
+                            _this.file_status = "is-danger"
+                            _this.file_label = 'Not a DOCX file! Try again'
+                        }
+                    }
+                },
+
+                convertDocxToHtml(arrayBuffer) {
+                    var _this = this
+
+                    mammoth.convertToHtml({ arrayBuffer })
+                        .then(function (result) {
+                            var html = result.value; // The generated HTML
+                            var messages = result.messages; // Any messages, such as warnings during conversion
+                            console.log({ html, messages })
+                            _this.convertHtmlToMd(html)
+                        })
+                        .done();
+
+                    // mammoth.convertToMarkdown({ arrayBuffer }).then(function (result) {
+                    //     var markdown = result.value
+                    //     var messages = result.messages; // Any messages, such as warnings during conversion
+                    //     console.log({ markdown, messages })
+                    //     _this.markdown = markdown
+                    // })
+                },
+
+                convertHtmlToMd(html) {
+                    html = html.replace(/ol>/g, 'ul>')
+                    this.html = html
+
+                    var turndownService = new TurndownService({
+                        bulletListMarker: '-',
+                        emDelimiter: '__'
+                    })
+
+                    this.markdown = turndownService.turndown(html)
+                },
+
+                copy(text_to_copy) {
+                    function listener(e) {
+                        e.clipboardData.setData("text/plain", text_to_copy)
+                        e.preventDefault()
+                    }
+
+                    document.addEventListener("copy", listener)
+
+                    try {
+                        document.execCommand("copy")
+                        console.log("Copied:", text_to_copy)
+                    } catch (e) {
+                        console.log("Copy failed.", e)
+                    } finally {
+                        document.removeEventListener("copy", listener)
+                    }
+                },
+            },
+        })
+    </script>
+
+</body>
+
+</html>
