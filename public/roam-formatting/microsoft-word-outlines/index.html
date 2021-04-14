@@ -49,16 +49,22 @@
                         </label>
                     </div>
 
+                    <br>
+                    <div>If that doesn't work, try copying from Microsoft Word to the textarea below:</div>
+                    <br>
+
                     <div>
                         <textarea id="clipboard-input" class="textarea" placeholder="Paste copied Word text here" readonly @paste="onPaste"></textarea>
                     </div>
-                    <div v-html="html"></div>
+
+                    <br>
+                    <div id="html_output" v-html="html"></div>
                 </div>
 
                 <div class="column">
                     <p class="label">Output</p>
-                    <textarea class="textarea" v-model="markdown" readonly rows="8"></textarea>
-                    <button class="button" @click="copy(markdown)">Copy</button>
+                    <textarea class="textarea" v-model="markdown" readonly rows="11"></textarea>
+                    <button class="button" @click="copy(markdown)">Copy Output for Roam</button>
 
                 </div>
             </div>
@@ -84,19 +90,82 @@
 
             methods: {
                 onPaste(e) {
-                    const html = e.clipboardData.getData("text/html")
+                    let html = e.clipboardData.getData("text/html")
 
                     if (html == "") {
                         alert("No useable data in that paste")
                         return
                     }
 
-                    // remove <style>
-                    // remove 'mso-list:Ignore'
-                    // convert mso-list: ... level2 ... to <li>, and wrap each with <ul>
-
                     this.html = html
-                    this.convertHtmlToMd(html)
+
+
+                    var _this = this
+                    setTimeout(parse, 100)
+
+                    function parse() {
+                        let $html = $('#html_output')
+                        $html.find('meta').remove()
+                        $html.find('link').remove()
+                        $html.find('style').remove()
+                        $html.find('[style="mso-list:Ignore"]').remove()
+                        $html.find('[style*="mso-ignore"]').remove()
+
+
+
+                        // ADD BULLET POINTS
+                        indentize($html.find('p'), 0)
+                        // $html.find('p').prepend(function () {
+                        //     if ($(this).text().trim() != "") return indentize(1)
+                        // })
+
+                        for (let i = 1; i < 9; i++) { // heading tags
+                            // $html.find(`[style*="mso-list:"][style*="level${i}"]`).prepend(indentize(i))
+                            indentize($html.find(`[style*="mso-list:"][style*="level${i}"]`), i)
+                        }
+
+                        // exceptions
+                        indentize($html.find(`[style*="mso-list:none"]`), 0)
+                        indentize($html.find(`[style*="tab-stops:list .25in"]`), 1)
+                        // $html.find(`[style*="mso-list:none"]`).prepend(indentize(0))
+                        // $html.find(`[style*="tab-stops:list .25in"]`).prepend(indentize(1))
+
+                        function indentize($els, i) {
+                            $els.map(function (j, el) {
+                                if ($(el).text().trim() != "")
+                                    $(el).prepend(Array(i + 1).join('&nbsp;&nbsp;&nbsp;&nbsp;') + '- ')
+                            })
+                        }
+
+                        // CONVERT TAGS TO <div>
+                        $html.find('p').replaceWith(convertToDiv)
+
+                        for (let i = 1; i < 9; i++) { // heading tags
+                            $html.find('h' + i).replaceWith(convertToDiv)
+                        }
+
+                        function convertToDiv() {
+                            return $("<div />").append($(this).contents())
+                        }
+
+                        // another way this might be done simpler is by using an array of tags ['p','h1','h2', etc.] and forEach on it to do both adding an '- ' and convert to <div>
+                        // tagsToCheck = ['p', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8', 'h9']
+                        // tagsToCheck.forEach((tag) => {
+                        //     $html.find(tag)
+                        // })
+
+
+                        // CONVERT HTML TO MARKDOWN
+                        TurndownService.prototype.escape = function (arg) { return arg } // disable escape characters
+
+                        var turndownService = new TurndownService({
+                            emDelimiter: '__'
+                        })
+
+                        _this.markdown = turndownService.turndown($html[0]).trim()//.replace(/\\- /g, '- ')
+                    }
+
+
                 },
 
                 addFile(e) {
@@ -157,7 +226,7 @@
                         emDelimiter: '__'
                     })
 
-                    this.markdown = turndownService.turndown(html)
+                    this.markdown = turndownService.turndown(html).trim()
                 },
 
                 copy(text_to_copy) {
