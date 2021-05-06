@@ -13,6 +13,7 @@
     <script src="./assets/vue-2.6.12.js"></script>
     <script src="./assets/linkify-2.1.8.min.js"></script>
     <script src="./assets/linkify-html-2.1.8.min.js"></script>
+    <script src="./assets/html2pdf.bundle.min.js"></script>
     <!-- <script src="./assets/linkify-jquery-2.1.8.min.js"></script> -->
     <link rel="stylesheet" href="./assets/bulma.min.css">
     <style>
@@ -59,6 +60,13 @@
         .nowrap {
             white-space: nowrap;
         }
+
+        .column_divider {
+            opacity: 0;
+            position: absolute;
+            z-index: -9999;
+            pointer-events: none;
+        }
     </style>
 </head>
 
@@ -73,7 +81,7 @@
 
                     <div class="file has-name is-boxed" :class="file_status">
                         <label class="file-label">
-                            <input class="file-input" type="file" name="file-input">
+                            <input class="file-input" type="file" name="file-input" @change="addFile">
                             <span class="file-cta">
                                 <span class="file-icon">
                                     <i class="fas fa-upload"></i>
@@ -101,10 +109,27 @@
                         </thead>
                         <tbody>
                             <tr v-for="chat in list">
-                                <td><span v-show="showFields.timestamp">{{chat.timestamp}}</span></td>
-                                <td><span v-show="showFields.from" v-html="nowrp2wrds(chat.from)"></span></td>
-                                <td v-if="chatType == 'private'"><span v-if="showFields.to" v-html="nowrp2wrds(nowrpDm(chat.to))"></span></td>
-                                <td><span v-show="showFields.message" class="prewrap" v-html="lnkfy(chat.message)"></span></td>
+                                <td>
+                                    <span v-show="showFields.timestamp">{{chat.timestamp}}&nbsp;</span>
+                                </td>
+                                <td>
+                                    <span v-show="showFields.from">
+                                        <span v-show="showFields.to" class="column_divider">From&nbsp;</span>
+                                        <span v-html="nowrp2wrds(chat.from)"></span>
+                                    </span>
+                                </td>
+                                <td v-if="chatType == 'private'">
+                                    <span v-show="showFields.to">
+                                        <span class="column_divider">&nbsp;to&nbsp;</span>
+                                        <span v-html="nowrp2wrds(nowrpDm(chat.to))"></span>
+                                    </span>
+                                </td>
+                                <td>
+                                    <span v-show="showFields.message">
+                                        <span class="column_divider">:&nbsp;</span>
+                                        <span class="prewrap" v-html="lnkfy(chat.message)"></span>
+                                    </span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
@@ -114,8 +139,9 @@
     </section>
 
     <script>
-        const privateChatLineRegex = /^(\d\d:\d\d:\d\d) From  (.*?)  to  (.*?) : ([\s\S]+)/
-        const publicChatOldRegex = /^(\d\d:\d\d:\d\d)\t From  (.*?) : ([\s\S]+)/
+        const privateChatLineRegex = /^(\d\d:\d\d:\d\d) From  ?(.*?)  ?to  ?(.*?) : ([\s\S]+)/
+        const publicChatOldRegex = /^(\d\d:\d\d:\d\d)\t From  ?(.*?) : ([\s\S]+)/
+        const privateNewRegex = /^(\d\d:\d\d:\d\d) From  ?(.*?)  ?to  ?(.*?):$/
 
         function getExtensionFromFilename(fileName) {
             const extensionMatch = fileName.match(/\.(\w+)$/)
@@ -124,7 +150,16 @@
 
         function determineChatType(line) {
 
+
+            // 18:44:56 From  Klaus Bravenboer  to  Everyone:
+            //    Took me a bit to write up my vision, had to mute the sound as I collected my words.
+            //	
+            //    In the next 5 weeks, I will inspire and create a founding team here on Samothraki Island that is committed to working with the best principles of consciousness, nature and technology to regenerate this island.
+            // if (privateNew.test(line))
+            //     return 'privateNew'
+
             // 12:58:22	Erik Newhard:	<message>
+            // else 
             if (line.split('\t').length == 3) // chat.txt // full session, public chat
                 return 'public'
 
@@ -183,6 +218,15 @@
             return lines
         }
 
+        function escapeHtml(str) {
+            return str
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;")
+        }
+
         var vm = new Vue({
             el: "#vm-app",
 
@@ -202,14 +246,14 @@
 
             methods: {
                 lnkfy(text) {
-                    return linkifyHtml(text, {
+                    return linkifyHtml(escapeHtml(text), {
                         defaultProtocol: 'https',
                         target: "_blank"
                     })
                 },
 
                 nowrp2wrds(text) {
-                    const split_text = text.split(' ')
+                    const split_text = escapeHtml(text).split(' ')
 
                     if (split_text.length > 2)
                         return `${split_text[0]}&nbsp;${split_text[1]} ${split_text.slice(2).join(' ')}`
@@ -247,9 +291,17 @@
                 },
 
                 addFile(e) {
-                    let file = e.dataTransfer.files[0]
+                    let file
 
-                    if (!file) return
+                    if (e.dataTransfer) // dragged file
+                        file = e.dataTransfer.files[0]
+                    if (e.target && e.target.files) // opened file from dialog
+                        file = e.target.files[0]
+
+                    if (!file) {
+                        console.log('File not detected')
+                        return
+                    }
 
                     let _this = this
 
@@ -274,6 +326,10 @@
                             _this.file_label = `${ext} is not a supported file extension. Please try again`
                         }
                     }
+                },
+
+                downloadPDF() {
+
                 },
             },
         })
