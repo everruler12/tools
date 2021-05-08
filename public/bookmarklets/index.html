@@ -31,7 +31,7 @@
         <div class="container">
             <h1 class="title">Erik's Bookmarklets</h1>
             <p>Instructions: Drag the button to your bookmarks bar. The bookmarklet will run the script on the active
-                page when clicked.</p>
+                page when clicked. (Then you can rename the bookmark if you want.)</p>
             <p v-for="bm in bookmarklets">
                 <a class="button bookmarklet" :href="bm.url" @click.prevent :disabled="bm.url==''">{{bm.name}}</a>
                 <span>{{bm.description}}</span>
@@ -74,6 +74,11 @@
                     "url": "",
                     "description": "Copy all highlights on the current Roam page",
                     "src": "copy-roam-highlights.js"
+                }, {
+                    "name": "Copy Roam Highlights (blockref)",
+                    "url": "",
+                    "description": "Copy all highlights on the current Roam page, including an aliased block reference to the original",
+                    "src": "copy-roam-highlights-blockref.js"
                 }]
                 // , {
                 //     "name": "",
