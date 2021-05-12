@@ -244,7 +244,7 @@ var vm = new Vue({
             return !this.filteredList.filter(x => x.to != '').length
         },
         noDMs() {
-            return this.chatType.type == 'type2' || this.filteredList.filter(x => x.to != '' || x.to != 'Everyone').length == 0
+            return this.chatType.type == 'type2' || this.list.filter(x => x.to != '' && x.to != 'Everyone').length == 0
         },
         noLinks() {
             return this.list.filter(x => !!this.lnkfy(x.message).match('<a href')).length == 0
