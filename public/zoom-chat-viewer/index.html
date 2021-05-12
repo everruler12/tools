@@ -67,17 +67,52 @@
             z-index: -9999;
             pointer-events: none;
         }
+
+        div.dropzone {
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 9999999999;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            transition: visibility 175ms, opacity 175ms;
+        }
+
+        label {
+            font-weight: bold;
+        }
+
+        /* v-cloak loading code from https://medium.com/vuejs-tips/v-cloak-45a05da28dc4
+           and https://jsfiddle.net/a5skrmo2/
+        */
+
+        [v-cloak]>* {
+            display: none;
+        }
+
+        [v-cloak]::before {
+            content: " ";
+            display: block;
+            width: 16px;
+            height: 16px;
+            background-image: url('data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==');
+        }
     </style>
 </head>
 
 <body>
-    <section id="vm-app" class="section" v-cloak @drop.prevent="addFile" @dragover.prevent>
+
+    <section id="vm-app" class="section" v-cloak>
+        <div v-if="showDropzone" class="dropzone" @drop.prevent="addFile" @dragover.prevent></div>
+
         <div class="container">
             <h1 class="title">Zoom Chat Viewer</h1>
             <div class="columns">
-                <div class="column">
 
-                    <p>Drag the Zoom chat .txt file to the area below, or click "Open file".</p>
+                <!-- File loader -->
+                <div class="column">
+                    <p>Drag the Zoom chat .txt file to this window, or click "Open file" below.</p>
 
                     <div class="file has-name is-boxed" :class="file_status">
                         <label class="file-label">
@@ -91,249 +126,88 @@
                             <span class="file-name">{{file_name}}</span>
                         </label>
                     </div>
+                </div>
 
-                    <p class="has-text-grey-light is-size-7 is-italic" v-if="list.length">Clicking a header hides/shows that column.
-                        <!-- TODO:zoom -->
-                        <!-- <br>Hovering over field makes a "copy" button appear. -->
-                    </p>
+                <!-- Dashboard -->
 
-                    <table class="table is-hoverable" v-if="list.length">
-                        <thead>
-                            <tr>
-                                <!-- TODO turn this into template component -->
-                                <th class="pointer sticky" :class="{'has-text-grey-light': !showFields.timestamp, 'is-size-7': !showFields.timestamp}" @click="showFields.timestamp = !showFields.timestamp">Time</th>
-                                <th class="pointer sticky" :class="{'has-text-grey-light': !showFields.from, 'is-size-7': !showFields.from}" @click="showFields.from = !showFields.from">From</th>
-                                <th class="pointer sticky" :class="{'has-text-grey-light': !showFields.to, 'is-size-7': !showFields.to}" @click="showFields.to = !showFields.to" v-if="chatType == 'private'">To</th>
-                                <th class="pointer sticky" :class="{'has-text-grey-light': !showFields.message, 'is-size-7': !showFields.message}" @click="showFields.message = !showFields.message">Message</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="chat in list">
-                                <td>
-                                    <span v-show="showFields.timestamp">{{chat.timestamp}}&nbsp;</span>
-                                </td>
-                                <td>
-                                    <span v-show="showFields.from">
-                                        <span v-show="showFields.to" class="column_divider">From&nbsp;</span>
-                                        <span v-html="nowrp2wrds(chat.from)"></span>
-                                    </span>
-                                </td>
-                                <td v-if="chatType == 'private'">
-                                    <span v-show="showFields.to">
-                                        <span class="column_divider">&nbsp;to&nbsp;</span>
-                                        <span v-html="nowrp2wrds(nowrpDm(chat.to))"></span>
-                                    </span>
-                                </td>
-                                <td>
-                                    <span v-show="showFields.message">
-                                        <span class="column_divider">:&nbsp;</span>
-                                        <span class="prewrap" v-html="lnkfy(chat.message)"></span>
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div class="column">
+                    <div v-if="file_status == 'is-success'">
+
+                        <p>Show fields:
+                            <label class="checkbox"><input type="checkbox" v-model="showFields.timestamp">Time</label>
+                            <label class="checkbox"><input type="checkbox" v-model="showFields.from">From</label>
+                            <label class="checkbox" :disabled="blankTO"><input type="checkbox" v-model="showFields.to" :disabled="blankTO">To</label>
+                            <label class="checkbox"><input type="checkbox" v-model="showFields.message">Message</label>
+                        </p>
+
+                        <p>Show messages:
+                            <span class="control">
+                                <label class="radio"><input type="radio" name="showMessage" v-model="showMessages" value="all">All</label>
+                                <label class="radio" :disabled="noDMs"><input type="radio" name="showMessage" v-model="showMessages" value="hideDMs" :disabled="noDMs">Without DMs</label>
+                                <label class="radio" :disabled="noDMs"><input type="radio" name="showMessage" v-model="showMessages" value="onlyDMs" :disabled="noDMs">Only DMs</label>
+                                <label class="radio" :disabled="noLinks"><input type="radio" name="showMessage" v-model="showMessages" value="links" :disabled="noLinks">Containing Links</label>
+                            </span>
+                        </p>
+
+                        <p><i>Showing {{filteredList.length}} of {{list.length}} messages.</i></p>
+
+                        <div>
+                            <button class="button" @click="downloadPDF">Download PDF (experiment)</button>
+                            <br>PDF converts as image, not text (so can't copy text). Working on better solution...
+                        </div>
+                    </div>
+
+                    <!-- <p class="has-text-grey-light is-size-7 is-italic" v-if="list.length">Clicking a header hides/shows that column.</p> -->
+
+                    <!-- TODO:zoom -->
+                    <!-- <br>Hovering over field makes a "copy" button appear. -->
+                    <!-- Include .txt metadata like created time in PDF -->
+
+
 
                 </div>
             </div>
+
+            <table id="pdf-output" class="table is-hoverable" v-if="list.length">
+                <thead>
+                    <tr>
+                        <!-- TODO turn this into template component -->
+                        <th class="sticky" v-show="showFields.timestamp">Time</th>
+                        <th class="sticky" v-show="showFields.from">From</th>
+                        <th class="sticky" v-show="showFields.to" v-if="!blankTO">To</th>
+                        <th class="sticky" v-show="showFields.message">Message</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="chat in filteredList">
+                        <!-- Time -->
+                        <td v-show="showFields.timestamp">
+                            <span>{{chat.timestamp}}&nbsp;</span>
+                        </td>
+
+                        <!-- From -->
+                        <td v-show="showFields.from">
+                            <span v-show="showFields.to" class="column_divider">From&nbsp;</span>
+                            <span v-html="nowrp2wrds(chat.from)"></span>
+                        </td>
+
+                        <!-- To -->
+                        <td v-show="showFields.to" v-if="!blankTO">
+                            <span class="column_divider" v-if="chat.to">&nbsp;to&nbsp;</span>
+                            <span v-html="nowrpDm(nowrp2wrds(chat.to))"></span>
+                        </td>
+
+                        <!-- Message -->
+                        <td v-show="showFields.message">
+                            <span class="column_divider">:&nbsp;</span>
+                            <span class="prewrap" v-html="lnkfy(chat.message)"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
     </section>
 
-    <script>
-        const privateChatLineRegex = /^(\d\d:\d\d:\d\d) From  ?(.*?)  ?to  ?(.*?) : ([\s\S]+)/
-        const publicChatOldRegex = /^(\d\d:\d\d:\d\d)\t From  ?(.*?) : ([\s\S]+)/
-        const privateNewRegex = /^(\d\d:\d\d:\d\d) From  ?(.*?)  ?to  ?(.*?):$/
-
-        function getExtensionFromFilename(fileName) {
-            const extensionMatch = fileName.match(/\.(\w+)$/)
-            return extensionMatch ? extensionMatch[0] : ''
-        }
-
-        function determineChatType(line) {
-
-
-            // 18:44:56 From  Klaus Bravenboer  to  Everyone:
-            //    Took me a bit to write up my vision, had to mute the sound as I collected my words.
-            //	
-            //    In the next 5 weeks, I will inspire and create a founding team here on Samothraki Island that is committed to working with the best principles of consciousness, nature and technology to regenerate this island.
-            // if (privateNew.test(line))
-            //     return 'privateNew'
-
-            // 12:58:22	Erik Newhard:	<message>
-            // else 
-            if (line.split('\t').length == 3) // chat.txt // full session, public chat
-                return 'public'
-
-            // 12:58:22 From  Erik Newhard  to  Everyone : <message>
-            else if (line.match(privateChatLineRegex)) // meeting_saved_chat.txt // personally saved file
-                // what if user name contains '  to  ' or ' : '?
-                return 'private'
-
-            // 12:58:22	 From  Erik Newhard : <message>
-            else if (line.match(publicChatOldRegex)) // meeting_saved_chat.txt // automatically saved file, old
-                return 'publicOld'
-
-            else
-                return 'unknown'
-        }
-
-        function parsePublicChat(line) {
-            const l = line.split('\t')
-            return {
-                timestamp: l[0],
-                from: l[1],
-                message: l[2]
-            }
-        }
-
-        function parsePrivateChat(line, i) {
-            const l = line.match(privateChatLineRegex)
-            return {
-                timestamp: l[1],
-                from: l[2],
-                to: l[3],
-                message: l[4]
-            }
-        }
-
-        function parsePublicOldChat(line, i) {
-            const l = line.match(publicChatOldRegex)
-            return {
-                timestamp: l[1],
-                from: l[2],
-                message: l[3]
-            }
-        }
-
-        function fixMultiline(lines, chatType) {
-            for (let i = 0; i < lines.length; i++) {
-                if ((chatType == 'public' && lines[i].split('\t').length != 3) ||
-                    (chatType == 'private' && !lines[i].match(privateChatLineRegex)) ||
-                    (chatType == 'publicOld' && !lines[i].match(publicChatOldRegex))
-                ) {
-                    lines[i - 1] += '\n' + lines[i]
-                    lines.splice(i, 1)
-                    i--
-                }
-            }
-            return lines
-        }
-
-        function escapeHtml(str) {
-            return str
-                .replace(/&/g, "&amp;")
-                .replace(/</g, "&lt;")
-                .replace(/>/g, "&gt;")
-                .replace(/"/g, "&quot;")
-                .replace(/'/g, "&#039;")
-        }
-
-        var vm = new Vue({
-            el: "#vm-app",
-
-            data: {
-                file_status: '',
-                file_label: 'Open file...',
-                file_name: '',
-                list: [],
-                chatType: '',
-                showFields: {
-                    timestamp: true,
-                    from: true,
-                    to: true,
-                    message: true
-                }
-            },
-
-            methods: {
-                lnkfy(text) {
-                    return linkifyHtml(escapeHtml(text), {
-                        defaultProtocol: 'https',
-                        target: "_blank"
-                    })
-                },
-
-                nowrp2wrds(text) {
-                    const split_text = escapeHtml(text).split(' ')
-
-                    if (split_text.length > 2)
-                        return `${split_text[0]}&nbsp;${split_text[1]} ${split_text.slice(2).join(' ')}`
-                    // return `<span class="nowrap">${split_text[0]} ${split_text[1]}</span> ${split_text.slice(2).join(' ')}`
-                    else
-                        return `<span class="nowrap">${text}</span>`
-                },
-
-                nowrpDm(text) {
-                    return text.replace(/(\(Direct Message\))$/, ` (Direct&nbsp;Message)`) // to make cleaner when 'To' is a direct message
-                    // return text.replace(/(\(Direct Message\))$/, ` <span class="nowrap">$1</span>`) // to make cleaner when 'To' is a direct message
-                },
-
-                parseData(txt) {
-
-                    let lines = txt.trim().split('\n')
-
-                    const chatType = determineChatType(lines[0]) // ['public', 'private', 'publicOld', 'unknown']
-                    this.chatType = chatType
-
-                    lines = fixMultiline(lines, chatType)
-
-                    if (chatType == 'public')
-                        this.list = lines.map(parsePublicChat)
-
-                    else if (chatType == 'private')
-                        this.list = lines.map(parsePrivateChat)
-
-                    if (chatType == 'publicOld')
-                        this.list = lines.map(parsePublicOldChat)
-
-                    else if (chatType == 'unknown')
-                        console.log(`Error: Can't determine chat type from\n`, lines[0])
-
-                },
-
-                addFile(e) {
-                    let file
-
-                    if (e.dataTransfer) // dragged file
-                        file = e.dataTransfer.files[0]
-                    if (e.target && e.target.files) // opened file from dialog
-                        file = e.target.files[0]
-
-                    if (!file) {
-                        console.log('File not detected')
-                        return
-                    }
-
-                    let _this = this
-
-                    const reader = new FileReader()
-                    reader.onload = loadData
-                    reader.readAsText(file)
-
-                    function loadData(event) {
-                        _this.file_name = file.name
-
-                        const ext = getExtensionFromFilename(file.name)
-
-                        if (ext == '.txt') {
-                            const data = event.target.result
-
-                            _this.file_status = "is-success"
-                            _this.file_label = `${ext} file loaded!`
-
-                            _this.parseData(data)
-                        } else {
-                            _this.file_status = "is-danger"
-                            _this.file_label = `${ext} is not a supported file extension. Please try again`
-                        }
-                    }
-                },
-
-                downloadPDF() {
-
-                },
-            },
-        })
-    </script>
+    <script src="/zoom-chat-viewer/app.js"></script>
 
 </body>
 
