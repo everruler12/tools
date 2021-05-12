@@ -153,6 +153,7 @@
 
                         <div>
                             <button class="button" @click="downloadPDF">Download PDF (experiment)</button>
+                            <button class="button" @click="saveNewTxt" :disabled="list.length==filteredList.length">Save new .txt</button>
                             <br>PDF converts as image, not text (so can't copy text). Working on better solution...
                         </div>
                     </div>

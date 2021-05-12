@@ -336,5 +336,18 @@ var vm = new Vue({
             var element = document.getElementById('pdf-output')
             html2pdf(element)
         },
+
+        saveNewTxt() {
+            const text = this.filteredList.map(x => x.original).join('\r\n')
+            const filename = 'New ' + this.file_name
+
+            let a = $('<a>', {
+                'href': 'data:text/plain;charset=utf-8,' + encodeURIComponent(text),
+                'download': filename,
+                'style': 'display:none;'
+            }).appendTo('body')
+            a[0].click()
+            a.remove()
+        }
     },
 })
