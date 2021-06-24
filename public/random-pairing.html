@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Random Pairing</title>
+    <script src="./assets/vue-2.6.12.js"></script>
+    <link rel="stylesheet" href="./assets/bulma.min.css">
+    <style>
+        .warning {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="vm-app" class="section" v-cloak>
+        <div class="columns">
+
+            <div class="column">
+                <textarea class="textarea" v-model="input" placeholder='Paste active members from spreadsheet here' rows="20"></textarea>
+                <button class="button" @click="randomize">Randomize</button>
+                <p class="warning">{{warning}}</p>
+            </div>
+
+            <div class="column">
+                <textarea class="textarea" v-model="output" readonly rows="20"></textarea>
+                <button class="button" @click="copy(output)">Copy</button>
+            </div>
+
+        </div>
+
+    </section>
+
+    <script>
+
+        var vm = new Vue({
+            el: "#vm-app",
+
+            data: {
+                input: '',
+                output: '',
+                warning: ''
+            },
+
+            mounted() {
+            },
+
+            computed: {
+            },
+
+            methods: {
+                randomize() {
+                    const names = this.input.trim().split('\n')
+
+                    if (names.length % 2 != 0) { // odd number of people
+                        this.warning = 'Odd number of people. Please add or remove Improvement Pill to make the number even.'
+                        return
+                    }
+
+                    this.warning = ''
+
+                    let chosen = []
+                    let random_names = []
+
+                    for (const name of names) {
+                        if (chosen.includes(name)) { // already chosen
+                            console.log(name, 'chosen')
+
+                            random_names.push({
+                                name,
+                                new_partner: random_names.find(x => x.new_partner == name).name
+                            })
+
+                        } else {
+                            console.log(name, 'pair')
+
+                            const pool = names.filter(n => n != name && !chosen.includes(n))
+                            const new_partner = pool[Math.floor(Math.random() * pool.length)]
+
+                            chosen.push(name)
+                            chosen.push(new_partner)
+
+                            random_names.push({
+                                name,
+                                new_partner
+                            })
+                        }
+                    }
+
+                    this.output = random_names.map(x => x.new_partner).join('\n')
+                },
+
+                copy(text_to_copy) {
+                    function listener(e) {
+                        e.clipboardData.setData("text/plain", text_to_copy)
+                        e.preventDefault()
+                    }
+
+                    document.addEventListener("copy", listener)
+
+                    try {
+                        document.execCommand("copy")
+                        console.log("Copied:", text_to_copy)
+                    } catch (e) {
+                        console.log("Copy failed.", e)
+                    } finally {
+                        document.removeEventListener("copy", listener)
+                    }
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>

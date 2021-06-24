@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notion Youtube Formatting Converter</title>
+    <script src="./assets/vue-2.6.12.js"></script>
+    <link rel="stylesheet" href="./assets/bulma.min.css">
+    <style>
+        .warning {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="vm-app" class="section" v-cloak>
+        <div class="columns">
+
+            <div class="column">
+                <textarea class="textarea" v-model="textareaNotion" placeholder='Notion text' rows="30"></textarea>
+                <button class="button" @click="copy(textareaNotion)">Copy</button>
+                <button class="button" @click="Notion2Youtube">Convert →</button>
+            </div>
+
+            <div class="column">
+                <textarea class="textarea" v-model="textareaYoutube" placeholder='YouTube text' rows="30"></textarea>
+                <button class="button" @click="Youtube2Notion">← Convert</button>
+                <button class="button" @click="copy(textareaYoutube)">Copy</button>
+                <div class="warning">{{warningYoutube}}</div>
+            </div>
+
+        </div>
+        <button class="button" @click="textareaNotion = textareaYoutube = ''">Clear All</button>
+
+    </section>
+
+    <script>
+
+        var vm = new Vue({
+            el: "#vm-app",
+
+            data: {
+                textareaNotion: '',
+                textareaYoutube: '',
+            },
+
+            mounted() {
+            },
+
+            computed: {
+                warningYoutube() {
+                    if (/\|\|3\|\|/.test(this.textareaYoutube))
+                        return '||3|| detected!'
+                    else
+                        return ''
+                }
+            },
+
+            methods: {
+                Notion2Youtube() {
+                    this.textareaYoutube = this.textareaNotion
+                        .replace(/\*\*\*/g, '||3||') // assuming bold within italics
+                        .replace(/\*\*/g, '||N2Y||')
+                        .replace(/\*/g, '_')
+                        .replace(/\|\|N2Y\|\|/g, '*')
+                        .replace(/^- /gm, '• ')
+                },
+
+                Youtube2Notion() {
+                    this.textareaNotion = this.textareaYoutube
+                        .replace(/\*/g, '**')
+                        .replace(/_/g, '*')
+                        .replace(/^• /gm, '- ')
+                },
+
+                copy(text_to_copy) {
+                    function listener(e) {
+                        e.clipboardData.setData("text/plain", text_to_copy)
+                        e.preventDefault()
+                    }
+
+                    document.addEventListener("copy", listener)
+
+                    try {
+                        document.execCommand("copy")
+                        console.log("Copied:", text_to_copy)
+                    } catch (e) {
+                        console.log("Copy failed.", e)
+                    } finally {
+                        document.removeEventListener("copy", listener)
+                    }
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>

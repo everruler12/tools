@@ -13,7 +13,7 @@
     <script src="./assets/vue-2.6.12.js"></script>
     <script src="./assets/linkify-2.1.8.min.js"></script>
     <script src="./assets/linkify-html-2.1.8.min.js"></script>
-    <script src="./assets/html2pdf.bundle.min.js"></script>
+    <!-- <script src="./assets/html2pdf.bundle.min.js"></script> -->
     <!-- <script src="./assets/linkify-jquery-2.1.8.min.js"></script> -->
     <link rel="stylesheet" href="./assets/bulma.min.css">
     <style>
@@ -126,6 +126,8 @@
                             <span class="file-name">{{file_name}}</span>
                         </label>
                     </div>
+
+                    <p class="gray">Note: Currently only chats saved in English can be parsed (of the pattern: <i>time</i> From <i>name ...</i>)</p>
                 </div>
 
                 <!-- Dashboard -->
@@ -152,9 +154,9 @@
                         <p><i>Showing {{filteredList.length}} of {{list.length}} messages.</i></p>
 
                         <div>
-                            <button class="button" @click="downloadPDF">Download PDF (experiment)</button>
+                            <!-- <button class="button" @click="downloadPDF">Download PDF (experiment)</button> -->
                             <button class="button" @click="saveNewTxt" :disabled="list.length==filteredList.length">Save new .txt</button>
-                            <br>PDF converts as image, not text (so can't copy text). Working on better solution...
+                            <!-- <br>PDF converts as image, not text (so can't copy text). Working on better solution... -->
                         </div>
                     </div>
 
