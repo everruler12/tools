@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ffmpeg trim command generator</title>
+    <script src="./assets/vue-2.6.12.js"></script>
+    <link rel="stylesheet" href="./assets/bulma.min.css">
+    <style>
+        .warning {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="vm-app" class="section" v-cloak>
+        <div class="columns">
+
+            <div class="column">
+
+                <div class="columns">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Input filename</label>
+                            <div class="control">
+                                <input class="input" v-model="input_file" @focus="$event.target.select()"></input>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Output filename</label>
+                            <div class="control">
+                                <input class="input" v-model="output_file" @focus="$event.target.select()"></input>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="columns">
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Start time</label>
+                            <div class="control">
+                                <input class="input" v-model="start_time" @focus="$event.target.select()"></input>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">End time</label>
+                            <div class="control">
+                                <input class="input" v-model="end_time" @focus="$event.target.select()"></input>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="button" @click="input_file = output_file = end_time = ''; start_time = '0'">Clear All</button>
+            </div>
+
+            <div class="column">
+                <div class="field">
+                    <label class="label">Output</label>
+                    <div class="control">
+                        <input class="input" v-model="output" @focus="$event.target.select()" readonly></input>
+                    </div>
+                </div>
+                <button class="button" @click="copy(output)">Copy</button>
+            </div>
+
+        </div>
+
+    </section>
+
+    <script>
+
+        var vm = new Vue({
+            el: "#vm-app",
+
+            data: {
+                input_file: '',
+                output_file: '',
+                start_time: '0',
+                end_time: '',
+            },
+
+            mounted() {
+            },
+
+            computed: {
+                start_seconds() {
+                    return this.timestamp2Seconds(this.start_time)
+                },
+                end_seconds() {
+                    return this.timestamp2Seconds(this.end_time)
+                },
+                output() {
+                    return `ffmpeg -i "${this.input_file}.mp4" -ss ${this.start_seconds} -to ${this.end_seconds} -c copy "${this.output_file}.mp4"`
+                }
+            },
+
+            methods: {
+                timestamp2Seconds(inputTimestamp) {
+                    const timestamp = inputTimestamp.split(':')
+
+                    if (timestamp.length == 3) {
+                        const hours = Number(timestamp[0])
+                        const minutes = Number(timestamp[1])
+                        const seconds = Number(timestamp[2])
+                        return (((hours * 60) + minutes) * 60) + seconds
+
+                    } else if (timestamp.length == 2) {
+                        const minutes = Number(timestamp[0])
+                        const seconds = Number(timestamp[1])
+                        return (minutes * 60) + seconds
+
+                    } else if (timestamp.length == 1) {
+                        const seconds = Number(timestamp[0])
+                        return seconds
+
+                    } else {
+                        return 'NaN!'
+                    }
+
+                },
+
+                copy(text_to_copy) {
+                    function listener(e) {
+                        e.clipboardData.setData("text/plain", text_to_copy)
+                        e.preventDefault()
+                    }
+
+                    document.addEventListener("copy", listener)
+
+                    try {
+                        document.execCommand("copy")
+                        console.log("Copied:", text_to_copy)
+                    } catch (e) {
+                        console.log("Copy failed.", e)
+                    } finally {
+                        document.removeEventListener("copy", listener)
+                    }
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>

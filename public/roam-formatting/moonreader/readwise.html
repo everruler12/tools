@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convert Moon Reader Pro+ Highlights to Readwise</title>
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+    <link rel="manifest" href="/site.webmanifest">
+    <script src="/assets/jquery-3.5.1.min.js"></script>
+    <script src="/assets/vue-2.6.12.js"></script>
+    <link rel="stylesheet" href="/assets/bulma.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.1/papaparse.min.js" integrity="sha512-EbdJQSugx0nVWrtyK3JdQQ/03mS3Q1UiAhRtErbwl1YL/+e2hZdlIcSURxxh7WXHTzn83sjlh2rysACoJGfb6g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <style>
+        .label {
+            margin-top: 0.5em;
+        }
+
+        .warning {
+            color: red
+        }
+    </style>
+</head>
+
+<body>
+    <section id="vm-app-moonreader" class="section" v-cloak @drop.prevent="addFile" @dragover.prevent>
+        <div class="container">
+            <h1 class="title">Convert Moon Reader Pro+ Highlights to Readwise</h1>
+            <div class="columns">
+                <div class="column">
+
+                    <p> <span class="label">Input .mrexpt</span> {{file_mrexpt}}</p>
+                    <p>
+                        Title: <input class="input" type="text" placeholder="Book title" v-model="title">
+                    </p>
+                    <p>
+                        Author: <input class="input" type="text" placeholder="Author name" v-model="author">
+                    </p>
+
+                    File content: <textarea class="textarea" placeholder="Paste or drag Moon Reader .mrexpt export here" v-model="mrexpt"></textarea>
+
+                    <button class="button" @click="downloadReadwiseCSV" :disabled="sorted_items == false">Download Readwise .csv</button>
+
+                    <div class="warning" v-show="warning">
+                        {{warning}}
+                    </div>
+
+                </div>
+
+                <!-- <div class="column">
+
+                    <p class="label">TSV Output</p>
+                    <textarea class="textarea" v-model="output" readonly rows="8"></textarea>
+
+                    <button class="button" @click="copy(output)">Copy</button>
+
+                </div> -->
+            </div>
+        </div>
+    </section>
+
+    <script>
+        var vm = new Vue({
+            el: "#vm-app-moonreader",
+
+            data: {
+                file_mrexpt: '',
+                mrexpt: '',
+                output: '',
+                sorted_items: [],
+                warning: '',
+                title: '',
+                author: ''
+            },
+
+            // computed: { },
+
+            mounted() { },
+
+            methods: {
+                addFile(e) { // from https://www.raymondcamden.com/2019/08/08/drag-and-drop-file-upload-in-vuejs
+                    let files = [...e.dataTransfer.files]
+
+                    if (!files) return
+
+                    let file = files[0]
+                    let _this = this
+
+                    reader = new FileReader()
+                    reader.onload = loadData
+                    reader.readAsText(file)
+
+                    function loadData(event) {
+                        const data = event.target.result
+                        console.log(file.name)
+                        console.log(data)
+
+                        if (file.name.match(/\.mrexpt$/)) {
+                            _this.warning = ''
+
+                            _this.file_mrexpt = file.name
+                            const title_author = file.name.replace(/\.mrexpt$/, '').split(' (')
+                            _this.title = title_author[0]
+                            _this.author = title_author[1] ? title_author[1].replace(/\)$/, '') : ''
+
+                            _this.mrexpt = data
+                            _this.convert(data)
+                        } else {
+                            _this.warning = 'Not an .mrexpt file'
+                        }
+                    }
+
+
+
+                },
+
+                convert(data) {
+                    if (!data) return ''
+
+                    const lines = data
+                        .trim() // removes blank line at end
+                        .split('\n')
+
+                    if (lines.length % 17 != 3) {
+                        // should be 3 lines of uneeded Moonreader metadata at star, with 17 lines/fields for each item
+                        console.log("Line count not expected")
+                        this.warning = `WARNING! Line count not expected. Stopped`
+                        return
+                    }
+
+                    this.warning = ''
+                    lines.splice(0, 3) // remove first 3 lines
+
+                    const numberOfFields = 17
+                    let items = []
+
+                    for (let i = 0; i < lines.length; i += numberOfFields) {
+                        items.push(lines.slice(i, i + numberOfFields))
+                    }
+
+
+                    const mapped_items = items.map(item => {
+                        return {
+                            // single_hasthtag: item[0],
+                            // index_number: item[1],
+                            book_title: item[2],
+                            // file_location_1: item[3],
+                            // file_location_2: item[4],
+                            chapter_number: item[5],
+                            // unknown_number_1: item[6],
+                            location_in_chapter_number: item[7],
+                            // unknown_number_2: item[8],
+                            // unknown_number_3: item[9],
+                            unix_timestamp: item[10],
+                            // unknown_blank_1: item[11],
+                            note: item[12], // empty for highlights without a note
+                            highlight: item[13],
+                            // unknown_number_4: item[14],
+                            // unknown_number_5: item[14],
+                            // unknown_number_6: item[15],
+                        }
+                    })
+
+                    console.log(mapped_items)
+
+
+                    function location_workaround(item) {
+                        return Number(item.chapter_number) * 1000000 + Number(item.location_in_chapter_number)
+                    }
+
+                    const sorted_items = mapped_items.sort((a, b) => location_workaround(a) - location_workaround(b))
+
+                    this.sorted_items = sorted_items
+
+                    this.output = sorted_items.map(item => item.highlight + '\t' + item.note).join('\n\n')
+
+                    return
+                },
+
+                copy(text_to_copy) {
+                    function listener(e) {
+                        e.clipboardData.setData("text/plain", text_to_copy)
+                        e.preventDefault()
+                    }
+
+                    document.addEventListener("copy", listener)
+
+                    try {
+                        document.execCommand("copy")
+                        console.log("Copied:", text_to_copy)
+                    } catch (e) {
+                        console.log("Copy failed.", e)
+                    } finally {
+                        document.removeEventListener("copy", listener)
+                    }
+                },
+
+                downloadReadwiseCSV() {
+                    if (!this.sorted_items.length)
+                        return
+
+                    function fixLinebreaks(text) {
+                        return text.replace(/<BR>/g, "\n")
+                    }
+                    // https://readwise.io/import_bulk
+                    // To import your CSV into Readwise, you need to use a header row with correctly titled columns. The order of the columns does not matter.
+                    // Highlight: (mandatory) the actual text of the highlight
+                    // Title: (optional) the name of the book or article
+                    // Author: (optional) the author of the book or article
+                    // URL (optional) the URL of the original article (if this is an article)
+                    // Note: (optional) the note you want to attach to the highlight (inline tags will work)
+                    // Location: (optional) the location of the highlight in the book or article. Must be an integer. (If no location is supplied, Readwise will default to the order of the highlights in the file)
+                    // Date: (optional) the date when highlight was taken (format: YEAR-MONTH-DAY HOUR:MINUTE:SECOND). Time is optional and defaults to midnight. Time is interpreted as in UTC timezone.
+
+                    const data = this.sorted_items.map(item => {
+                        return {
+                            "Highlight": fixLinebreaks(item.highlight),
+                            "Title": this.title,
+                            "Author": this.author,
+                            // "URL": ,
+                            "Note": fixLinebreaks(item.note),
+                            // "Location": item,
+                            "Date": new Date(Number(item.unix_timestamp)).toISOString().replace('T', ' ').replace(/\.\d\d\dZ$/, '')
+                        }
+                    })
+
+                    const csv = Papa.unparse(data)
+
+                    let a = $('<a>', {
+                        'href': 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv),
+                        'download': this.file_mrexpt.replace(/mrexpt$/, "csv"),
+                        'style': 'display:none;'
+                    }).appendTo('body')
+                    a[0].click()
+                    a.remove()
+                },
+            },
+        })
+    </script>
+
+</body>
+
+</html>

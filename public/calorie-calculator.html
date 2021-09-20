@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calorie Cenerator</title>
+    <script src="./assets/vue-2.6.12.js"></script>
+    <link rel="stylesheet" href="./assets/bulma.min.css">
+    <style>
+        .warning {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="vm-app" class="section" v-cloak>
+        <div class="columns">
+
+            <div class="column">
+                <div class="field">
+                    <label class="label">Total Grams</label>
+                    <div class="control">
+                        <input class="input" v-model.number="total_grams" @focus="$event.target.select()"></input>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="column">
+                <div class="field">
+                    <label class="label">Grams per serving</label>
+                    <div class="control">
+                        <input class="input" v-model.number="grams_per_serving" @focus="$event.target.select()"></input>
+                    </div>
+                </div>
+            </div>
+
+            <div class="column">
+                <div class="field">
+                    <label class="label">Calories per serving</label>
+                    <div class="control">
+                        <input class="input" v-model.number="cal_per_serving" @focus="$event.target.select()"></input>
+                    </div>
+                </div>
+            </div>
+
+
+            <div class=" column">
+                <div class="field">
+                    <label class="label">Output</label>
+                    <div class="control">
+                        <input class="input" v-model="output" @focus="$event.target.select()" readonly></input>
+                    </div>
+                </div>
+
+                <button class="button" @click="copy(output)">Copy</button>
+            </div>
+
+        </div>
+
+        <button class="button" @click="total_grams = grams_per_serving = cal_per_serving = ''">Clear All</button>
+
+    </section>
+
+    <script>
+
+        var vm = new Vue({
+            el: "#vm-app",
+
+            data: {
+                total_grams: '',
+                grams_per_serving: '',
+                cal_per_serving: ''
+            },
+
+            mounted() {
+            },
+
+            computed: {
+                cal_per_serving() {
+                    return this.timestamp2Seconds(this.cal_per_serving)
+                },
+                cal_per_serving() {
+                    return this.timestamp2Seconds(this.cal_per_serving)
+                },
+                output() {
+                    return Number((this.total_grams / this.grams_per_serving * this.cal_per_serving).toFixed(6))
+                }
+            },
+
+            methods: {
+
+                copy(text_to_copy) {
+                    function listener(e) {
+                        e.clipboardData.setData("text/plain", text_to_copy)
+                        e.preventDefault()
+                    }
+
+                    document.addEventListener("copy", listener)
+
+                    try {
+                        document.execCommand("copy")
+                        console.log("Copied:", text_to_copy)
+                    } catch (e) {
+                        console.log("Copy failed.", e)
+                    } finally {
+                        document.removeEventListener("copy", listener)
+                    }
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>
