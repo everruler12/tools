@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Treasure Hunt 2021 - Newhard</title>
+    <link rel="manifest" href="/site.webmanifest">
+    <!-- <script src="/assets/jquery-3.5.1.min.js"></script> -->
+    <script src="/assets/vue-2.6.12.js"></script>
+    <link rel="stylesheet" href="/assets/bulma.min.css">
+    <style>
+        .center {
+            text-align: center;
+        }
+
+        .pre {
+            white-space: pre;
+        }
+
+        p {
+            padding: 0.25em;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="vm-app" class="section">
+        <div class="container">
+
+            <h2 class="subtitle" @click="showDebugclick++">Treasure Hunt 2021</h2>
+
+            <div>
+                <p class="center" v-if="showDebug"><b>DEBUG</b> Step: {{step}}
+                    <button class="button" @click="reset">Reset</button>
+                </p>
+            </div>
+
+            <h1 class="title center" v-show="!!name_initial">{{name_initial}}</h1>
+
+
+            <div v-if="step == -1">
+                <p>Please enter your first name's initial:</p>
+                <input class="input" type="text" v-model="name_initial_input" @keyup.enter="submitInitial" maxlength="1">
+                <button class="button" @click="submitInitial">Submit</button>
+            </div>
+
+
+            <div v-if="step >= 0">
+                <br>
+                <div v-for="(clue, i) in clues">
+                    <p class="pre" v-show="(i <= step && i <= keyword_to_guess) && (i % name_initials.length == name_initial_index) "><b>Clue #{{i+1}}:</b> {{clue.riddle}}</p>
+                    <p v-show="(i < keyword_to_guess) && ((i % name_initials.length) == (name_initial_index+2)%3)"><b>Keyword #{{i+1}}:</b> {{clue.keyword}}</p>
+                </div>
+
+                <!-- current keyword guess -->
+                <br>
+                <div v-if="step < 9">
+                    <b>Keyword from Clue #{{keyword_to_guess+1}}:</b>
+                    <input class="input" type="text" v-model="keyword_input" @keyup.enter="submitKeyword">
+                    <button class="button" @click="submitKeyword">Submit</button>
+                </div>
+
+            </div>
+
+            <div v-if="step == 9 || step == 100">
+                <div v-if="name_initial == 'K'">
+                    <p><b>Clue #10c:</b> ...and find what's formed by their initials.</p>
+                </div>
+
+                <div v-if="name_initial == 'M'">
+                    <p><b>Clue #10a:</b> Gather all nine keywords...</p>
+                </div>
+
+                <div v-if="name_initial == 'J'">
+                    <p><b>Clue #10b:</b> ...and reverse the list...</p>
+                </div>
+            </div>
+
+    </section>
+
+
+    <script>
+        var vm = new Vue({
+            el: "#vm-app",
+            data: {
+                //save
+                name_initial_index: -1,
+                step: -1,
+                // other
+                showDebugclick: 0,
+                name_initial_input: '',
+                name_initials: ['K', 'M', 'J'],
+                keyword_input: '',
+                clues: [{
+                    riddle: `In the winter when you're cold,
+You come to me to warm your toes.`,
+                    keyword: 'EDINBURGH',
+                    guess: 2
+                }, {
+                    riddle: `Look at me and I'll show you.
+Behind me is your next clue.`,
+                    keyword: 'LONDON',
+                    guess: 0
+                }, {
+                    riddle: `Give me energy and keep me supplied.
+I'll create a constant winter inside.`,
+                    keyword: 'BALTIMORE',
+                    guess: 1
+                }, {
+                    riddle: `If you ride me, you'll go nowhere.`,
+                    keyword: 'AMSTERDAM',
+                    guess: 5
+                }, {
+                    riddle: `I'm a box of cardboard.
+On my top there's a slot.
+Putting stuff in is hard.
+What's it used for? It's not.`,
+                    keyword: 'TRIPOLI',
+                    guess: 3
+                }, {
+                    riddle: `I write but without a pen.
+I draw but not on a pad.
+I always want some color,
+For without, my work is bad.`,
+                    keyword: 'LIVERPOOL',
+                    guess: 4
+                }, {
+                    riddle: `People garbed come around once a year.
+You hand me out to prevent more fear.`,
+                    keyword: 'OSLO',
+                    guess: 8
+                }, {
+                    riddle: `Round and round and round I go,
+Keeping you cool by my blow.`,
+                    keyword: 'OSAKA',
+                    guess: 6
+                }, {
+                    riddle: `Used to wield power and glory
+Yet results were rather gory
+When it wrote our human story
+In the eyes of wiser men
+it is weaker than a pen`,
+                    keyword: 'PARIS',
+                    guess: 7
+                }]
+
+            },
+
+            computed: {
+                name_initial() {
+                    const ni = this.name_initials[this.name_initial_index]
+                    return ni ? ni : ''
+                },
+
+                showDebug() {
+                    const sdc = this.showDebugclick
+                    if (sdc == 5)
+                        return true
+                    if (sdc > 5)
+                        this.showDebugclick = 0
+                    return false
+                },
+
+                keyword_to_guess() {
+                    if (this.step < this.clues.length)
+                        return this.clues[this.step].guess
+                    else
+                        return this.clues.length
+                },
+
+                show_final() {
+                    return this.step == 100 ? true : false
+                }
+            },
+
+            methods: {
+                submitInitial() {
+                    const ni = this.name_initial_input.toUpperCase()
+                    const nii = this.name_initials.indexOf(ni)
+
+                    if (nii > -1) {
+                        this.name_initial_index = nii
+                        this.step = nii
+                    } else {
+                        alert(`"${ni}" not accepted`)
+                    }
+                },
+
+                submitKeyword() {
+                    const guess = this.keyword_input.toUpperCase()
+                    const guessInd = this.clues[this.step].guess
+                    const answer = this.clues[guessInd].keyword
+                    if (guess == answer) {
+                        this.step += 3
+                        this.keyword_input = ""
+
+                        if (this.step >= 9) {
+                            setTimeout(() => {
+                                this.step = 100
+                            }, 60000)
+                        }
+                    } else
+                        alert(`"${guess}" is incorrect`)
+                },
+
+                save() {
+                    const data = {
+                        name_initial_index: this.name_initial_index,
+                        step: this.step
+                    }
+
+                    localStorage.setItem('save', JSON.stringify(data))
+                },
+
+                load() {
+                    const save = localStorage.getItem('save')
+                    if (save) {
+                        const data = JSON.parse(save)
+                        this.name_initial_index = data.name_initial_index
+                        this.step = data.step
+                    }
+                },
+
+                reset() {
+                    this.name_initial_index = -1
+                    this.step = -1
+                }
+            },
+
+            mounted() {
+                this.load()
+            },
+
+            watch: {
+                name_initial_index: {
+                    handler() {
+                        this.save()
+                    }
+                },
+                step: {
+                    handler() {
+                        this.save()
+                    }
+                },
+                show_final: {
+                    handler() {
+                        this.save()
+                    }
+                },
+            },
+        })
+    </script>
+
+</body>
+
+</html>

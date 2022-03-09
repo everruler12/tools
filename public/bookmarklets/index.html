@@ -45,20 +45,25 @@
             el: "#vm-app-bookmarklets",
             data: {
                 bookmarklets: [{
-                    "name": "jQuerify",
-                    "url": "",
-                    "description": "Adds jQuery to the webpage. Useful for testing things in DevTools console.",
-                    "src": "jquerify.js"
-                }, {
                     "name": "Copy Title & Url",
                     "url": "",
-                    "description": "Copies a webpage's title and URL. Will be pasted as a link if supported in app (Roam, Notion, Circle, Gmail, etc.), or else as plain text separated with a linebreak (Zoom, Notepad, etc.).",
+                    "description": "Copies a webpage's title and URL. Will be pasted as a link if supported in app (Roam, Notion, Circle, Gmail, etc.), or else as plain text separated with a linebreak (Zoom, Notepad, etc.). Note: Gmail links and titles are parsed to be cleaner.",
                     "src": "copy-title-and-url.js"
+                }, {
+                    "name": "Copy Gmail Url",
+                    "url": "",
+                    "description": "Copies the link to a Gmail email",
+                    "src": "copy-gmail-url.js"
                 }, {
                     "name": "Copy Evernote Highlights",
                     "url": "",
                     "description": "Copies the highlights of a note in Evernote.",
                     "src": "copy-evernote-highlights.js"
+                }, {
+                    "name": "jQuerify",
+                    "url": "",
+                    "description": "Adds jQuery to the webpage. Useful for testing things in DevTools console.",
+                    "src": "jquerify.js"
                 }, {
                     "name": "SCSMP",
                     "url": "",

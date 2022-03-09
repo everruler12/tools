@@ -26,7 +26,7 @@
                         <div class="field">
                             <label class="label">Input filename</label>
                             <div class="control">
-                                <input class="input" v-model="input_file" @focus="$event.target.select()"></input>
+                                <input class="input" v-model="input_file"></input>
                             </div>
                         </div>
                     </div>
@@ -35,7 +35,7 @@
                         <div class="field">
                             <label class="label">Output filename</label>
                             <div class="control">
-                                <input class="input" v-model="output_file" @focus="$event.target.select()"></input>
+                                <input class="input" v-model="output_file"></input>
                             </div>
                         </div>
                     </div>
@@ -46,7 +46,7 @@
                         <div class="field">
                             <label class="label">Start time</label>
                             <div class="control">
-                                <input class="input" v-model="start_time" @focus="$event.target.select()"></input>
+                                <input class="input" v-model="start_time"></input>
                             </div>
                         </div>
                     </div>
@@ -55,7 +55,7 @@
                         <div class="field">
                             <label class="label">End time</label>
                             <div class="control">
-                                <input class="input" v-model="end_time" @focus="$event.target.select()"></input>
+                                <input class="input" v-model="end_time"></input>
                             </div>
                         </div>
                     </div>
@@ -68,8 +68,18 @@
                 <div class="field">
                     <label class="label">Output</label>
                     <div class="control">
-                        <input class="input" v-model="output" @focus="$event.target.select()" readonly></input>
+                        <input class="input" v-model="output" readonly></input>
                     </div>
+                </div>
+                <div class="control">
+                    <label class="radio">
+                        <input type="radio" value="fast" v-model="mode">
+                        fast
+                    </label>
+                    <label class="radio">
+                        <input type="radio" value="perfect" v-model="mode">
+                        perfect
+                    </label>
                 </div>
                 <button class="button" @click="copy(output)">Copy</button>
             </div>
@@ -88,6 +98,7 @@
                 output_file: '',
                 start_time: '0',
                 end_time: '',
+                mode: 'fast'
             },
 
             mounted() {
@@ -101,7 +112,8 @@
                     return this.timestamp2Seconds(this.end_time)
                 },
                 output() {
-                    return `ffmpeg -i "${this.input_file}.mp4" -ss ${this.start_seconds} -to ${this.end_seconds} -c copy "${this.output_file}.mp4"`
+                    const fast_or_perfect = this.mode == 'fast' ? '-c copy ' : ''
+                    return `ffmpeg -i "${this.input_file}.mp4" -ss ${this.start_seconds} -to ${this.end_seconds} ${fast_or_perfect}"${this.output_file}.mp4"`
                 }
             },
 

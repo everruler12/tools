@@ -1,23 +1,34 @@
 (function () {
-    function getURL() {
-        return document.URL
+
+    init()
+
+    function init() {
+        let url = document.URL
+        let title = document.title
+
+        if (!!url.match('mail.google.com')) {
+            url = getGmailUrl()
+            title = title.replace(/(.*) - .*?@gmail\.com - Gmail$/, '$1 - Gmail')
+        }
+
+        copyLink(url, title)
     }
 
-    function getTitle(url) {
-        if (url.indexOf('mail.google.com') !== -1) {
-            return document.title.replace(/ - .*?@gmail\.com - Gmail$/, ' - Gmail')
+    function getGmailUrl() {
+        const email = document.title.replace(/^.* - (.*?@gmail\.com) - Gmail$/, '$1')
+
+        const id = location.hash.split('/').at(-1)
+
+        if (location.hash === '' || id[0] === '#') {
+            return document.URL
         } else {
-            return document.title
+            return `https://mail.google.com/mail/u/${email}/#all/${id}`
         }
     }
 
-    const url = getURL()
-    const title = getTitle(url)
-
-    copyLink(url, title)
-
     function copyLink(url, title) {
         function listener(e) {
+            if (!title) title = url
             e.clipboardData.setData("text/plain", title + '\n' + url)
             e.clipboardData.setData("text/html", `<a href="${url}">${title}</a>`)
             e.clipboardData.setData("text/_notion-text-production", `{"editing": [["${title}",[["a","${url}"]]]],"selection": {"startIndex": 0,"endIndex": ${title.length}}}`)
