@@ -377,7 +377,7 @@ var vm = new Vue({
 
         saveNewTxt() {
             const text = this.filteredList.map(x => x.original).join('\r\n')
-            const filename = this.file_name + ' (New)'
+            const filename = this.file_name.replace(/.txt$/, '') + ' (New).txt'
 
             let a = $('<a>', {
                 'href': 'data:text/plain;charset=utf-8,' + encodeURIComponent(text),
