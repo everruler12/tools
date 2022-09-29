@@ -16,6 +16,17 @@ const chatTypes = [
     // Filename: "GMT<YYYYMMDD>-<hhmmss>_<Meeting name>.txt"
     // Description: Automatically saved when video recorded in cloud, only for the recorded portion of video. (Doesn't contain DM.)
     {
+        type: 'type5',
+        // Filetype: msc
+        // Description: single-spaced, capital "To", "Privately"
+        // Example: `type5 [2022-09-27 Zoom v5.12.0 BASB15 Live Session 3A]`
+        // 00:00:00 From <name> To Everyone:
+        //    <message 1 line 1>
+        //    <message 1 line 2>
+        // 00:00:00 From <name> To <name>(Privately):
+        //    <message 2>
+        regex: /^(\d\d:\d\d:\d\d) From ?(.*?) ?To ?(.+):$/
+    }, {
         type: 'type4',
         // Filetype: msc
         // Description: Contains TO. Current.
@@ -87,6 +98,9 @@ function determineChatType(firstLine) {
 }
 
 parseChat = {
+    type5(lines, regex) {
+        return this.type4(lines, regex)
+    },
     type4(lines, regex) {
         let list = []
 
@@ -252,6 +266,25 @@ var vm = new Vue({
     },
 
     methods: {
+        reset() {
+            this.file_status = ''
+            this.file_label = 'Open file...'
+            this.file_name = ''
+            this.list = []
+            this.chatType = ''
+            this.showFields = {
+                timestamp: true,
+                from: true,
+                to: true,
+                message: true,
+            }
+            this.showMessages = 'all'
+            this.showDropzone = false
+            this.loadedText = ''
+            this.chatType = {}
+        },
+
+
         lnkfy(text) {
             return linkifyHtml(escapeHtml(text), {
                 defaultProtocol: 'https',
@@ -287,11 +320,16 @@ var vm = new Vue({
             if (chatType) {
                 this.chatType = chatType
                 this.list = parseChat[chatType.type](lines, chatType.regex)
-            } else
+            } else {
                 console.log(`Error: Unknown chat type`)
+                this.file_status = "is-danger"
+                this.file_label = `Unsupported chat type`
+            }
         },
 
         addFile(e) {
+            this.reset()
+
             this.showDropzone = false
 
             let file
@@ -327,7 +365,7 @@ var vm = new Vue({
                     _this.parseData(data)
                 } else {
                     _this.file_status = "is-danger"
-                    _this.file_label = `${ext} is not a supported file extension. Please try again`
+                    _this.file_label = `${ext} is not a supported file extension. Please try again with a .txt file`
                 }
             }
         },
@@ -339,7 +377,7 @@ var vm = new Vue({
 
         saveNewTxt() {
             const text = this.filteredList.map(x => x.original).join('\r\n')
-            const filename = 'New ' + this.file_name
+            const filename = this.file_name + ' (New)'
 
             let a = $('<a>', {
                 'href': 'data:text/plain;charset=utf-8,' + encodeURIComponent(text),
