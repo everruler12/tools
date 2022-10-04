@@ -196,7 +196,7 @@
 
                         <!-- To -->
                         <td v-show="showFields.to" v-if="!blankTO">
-                            <span class="column_divider" v-if="chat.to">&nbsp;to&nbsp;</span>
+                            <span class="column_divider" v-if="chat.to">&nbsp;{{chatType.type == 'type5' ? 'To' : 'to'}}&nbsp;</span>
                             <span v-html="nowrpDm(nowrp2wrds(chat.to))"></span>
                         </td>
 

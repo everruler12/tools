@@ -25,7 +25,7 @@ const chatTypes = [
         //    <message 1 line 2>
         // 00:00:00 From <name> To <name>(Privately):
         //    <message 2>
-        regex: /^(\d\d:\d\d:\d\d) From ?(.*?) ?To ?(.+):$/
+        regex: /^(\d\d:\d\d:\d\d) From ?(.*?) ?To (.+):$/
     }, {
         type: 'type4',
         // Filetype: msc
@@ -213,7 +213,6 @@ var vm = new Vue({
         file_label: 'Open file...',
         file_name: '',
         list: [],
-        chatType: '',
         showFields: {
             timestamp: true,
             from: true,
@@ -271,7 +270,6 @@ var vm = new Vue({
             this.file_label = 'Open file...'
             this.file_name = ''
             this.list = []
-            this.chatType = ''
             this.showFields = {
                 timestamp: true,
                 from: true,
