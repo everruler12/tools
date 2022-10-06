@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interval Timer</title>
+    <script src="/assets/vue-2.6.12.js"></script>
+    <script src="/assets/moment.min-2.29.4.js"></script>
+    <link rel="stylesheet" href="/assets/bulma.min.css">
+    <style>
+        .warning {
+            color: red;
+        }
+    </style>
+</head>
+
+<body>
+    <section id="vm-app" class="section" v-cloak>
+
+        <div>
+            Interval: {{intervalLength}} seconds
+            <!-- TODO change to input -->
+        </div>
+
+        <div>
+            <button class="button" @click="toggleTimer">{{timerActive ? 'Stop' : 'Start'}}</button>
+        </div>
+
+        <div>
+            {{timeRemaining}}
+        </div>
+
+    </section>
+
+    <script>
+        var interval
+
+        var vm = new Vue({
+            el: "#vm-app",
+
+            data: {
+                intervalLength: 120, // 2min in sec
+                timeRemaining: '...',
+                timerActive: false,
+                startTime: null,
+                restartTime: null
+            },
+
+            mounted() {
+                this.resetTimeRemaining()
+            },
+
+            computed: {
+
+            },
+
+            methods: {
+                toggleTimer() {
+
+                    if (this.timerActive) {
+                        this.stop()
+                    } else {
+                        this.start()
+                    }
+                },
+
+                start() {
+                    this.timerActive = true
+                    this.startTime = moment()
+                    this.restartTime = moment().add(this.intervalLength, 'seconds')//.add(1, "seconds")
+                    this.resetTimeRemaining()
+                    interval = setInterval(() => {
+
+                        const _this = this
+                        function diff() {
+                            return _this.restartTime.diff(moment())
+                        }
+
+                        if (diff() < 0) {
+                            clearInterval(interval)
+                            this.playSound()
+                            this.start()
+                        }
+
+                        this.timeRemaining = moment.utc(diff()).format('m:ss')
+
+                    }, 100)
+                },
+
+                stop() {
+                    clearInterval(interval)
+                    this.resetTimeRemaining()
+                    this.timerActive = false
+                },
+
+                resetTimeRemaining() {
+                    this.timeRemaining = moment.utc(this.intervalLength * 1000).format('m:ss')
+                },
+
+                playSound() {
+                    var audio = new Audio('/interval-timer/beep-07a.mp3')
+                    audio.play()
+                }
+            },
+        })
+    </script>
+</body>
+
+</html>
