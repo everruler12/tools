@@ -34,18 +34,20 @@ function jquerify() {
 function init() {
 
     // check that page is on lu.ma and ends it /edit
-    if (location.hostname != "lu.ma" || location.pathname.split('?')[0].split('/').pop() != "edit")
+    if (location.hostname != "lu.ma" || location.pathname.split('?')[0].split('/').pop() != "edit") {
+        alert("Page not supported.\nNavigate to a Luma Event, click on Manage Event, go to Details.")
         return
+    }
 
 
-    let new_zoomMeetingUrl = prompt("New Zoom Meeting URL")
+    let new_zoomMeetingUrl = prompt("Enter the new Zoom meeting's link")
 
     if (!new_zoomMeetingUrl)
         return
 
     new_zoomMeetingUrl = new_zoomMeetingUrl.trim()
 
-    let new_zoomMeetingPassword = prompt("New Zoom Meeting Password")
+    let new_zoomMeetingPassword = prompt("Enter the new Zoom meeting's Passcode")
     new_zoomMeetingPassword = new_zoomMeetingPassword.trim()
 
     var listOfFutureSessions = $('.session-list > .session-wrapper:not(:has(.passed))')
