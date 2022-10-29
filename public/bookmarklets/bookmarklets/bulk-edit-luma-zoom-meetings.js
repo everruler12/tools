@@ -1,3 +1,4 @@
+jquerify()
 function jquerify() {
     if (window.jQuery) {
         console.log(`jQuerify: Already loaded`)
@@ -30,9 +31,6 @@ function jquerify() {
     }
 }
 
-
-
-init()
 function init() {
 
     // check that page is on lu.ma and ends it /edit
