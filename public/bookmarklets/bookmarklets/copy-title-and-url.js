@@ -8,14 +8,16 @@
 
         if (!!url.match('mail.google.com')) {
             url = getGmailUrl()
-            title = title.replace(/(.*) - .*?@gmail\.com - Gmail$/, '$1 - Gmail')
+            title = title.split('-').slice(0, -2).join().trim()
         }
 
         copyLink(url, title)
     }
 
     function getGmailUrl() {
-        const email = document.title.replace(/^.* - (.*?@gmail\.com) - Gmail$/, '$1')
+        // title pattern is: `${email subject line} - ${email address} - ${name of mail provider}
+        // ${name of mail provider} is 'Gmail' or the Google Workspace 'Mail'
+        const email = document.title.split('-').at(-2).trim()
 
         const id = location.hash.split('/').at(-1)
 
