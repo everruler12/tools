@@ -68,6 +68,7 @@
 
                 start() {
                     this.timerActive = true
+                    this.playSound()
                     this.startTime = moment()
                     this.restartTime = moment().add(this.intervalLength, 'seconds')//.add(1, "seconds")
                     this.resetTimeRemaining()
@@ -80,7 +81,7 @@
 
                         if (diff() < 0) {
                             clearInterval(interval)
-                            this.playSound()
+                            // this.playSound()
                             this.start()
                         }
 
@@ -100,7 +101,8 @@
                 },
 
                 playSound() {
-                    var audio = new Audio('/interval-timer/beep-07a.mp3')
+                    // var audio = new Audio('/interval-timer/beep-07a.mp3')
+                    var audio = new Audio('/interval-timer/shooting_star-Mike_Koenig-1132888100.mp3')
                     audio.play()
                 }
             },
