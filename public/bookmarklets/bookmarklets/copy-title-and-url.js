@@ -8,7 +8,7 @@
 
         if (!!url.match('mail.google.com')) {
             url = getGmailUrl()
-            title = title.split('-').slice(0, -2).join().trim()
+            title = title.split('-').slice(0, -2).join().trim() + ' - Gmail'
         }
 
         copyLink(url, title)
