@@ -3,29 +3,27 @@
     init()
 
     function init() {
-        let url = document.URL
         let title = document.title
+        let url = document.URL
 
         if (!!url.match('mail.google.com')) {
-            url = getGmailUrl()
-            title = title.split('-').slice(0, -2).join().trim() + ' - Gmail'
+
+            const id = location.hash.split('/').at(-1)
+
+            if (location.hash === '' || id[0] === '#') {
+                // keep title and url
+            } else {
+                const email = document.title.split('-').at(-2).trim()
+
+                // title pattern is: `${email subject line} - ${email address} - ${name of mail provider}
+                // ${name of mail provider} is 'Gmail' or the Google Workspace 'Mail'
+
+                title = title.split('-').slice(0, -2).join().trim() + ' - Gmail'
+                url = `https://mail.google.com/mail/u/${email}/#all/${id}`
+            }
         }
 
         copyLink(url, title)
-    }
-
-    function getGmailUrl() {
-        // title pattern is: `${email subject line} - ${email address} - ${name of mail provider}
-        // ${name of mail provider} is 'Gmail' or the Google Workspace 'Mail'
-        const email = document.title.split('-').at(-2).trim()
-
-        const id = location.hash.split('/').at(-1)
-
-        if (location.hash === '' || id[0] === '#') {
-            return document.URL
-        } else {
-            return `https://mail.google.com/mail/u/${email}/#all/${id}`
-        }
     }
 
     function copyLink(url, title) {
