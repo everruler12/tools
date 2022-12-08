@@ -63,34 +63,41 @@
 
                     const time_type = this.time_type
 
-                    function timeToLxnDur(dur) { // where duration is of the format 0:00 or 00:00 or 0:00:00
-                        const dur_split = dur.split(':')
+                    function timeToLxnDur(time) { // where duration is of the format 0:00 or 00:00 or 0:00:00
+                        const time_split = time.split(':')
 
                         // TODO add error checking for matching /^/d/d$/
 
                         let days = 0
                         let hours = 0
 
-                        if (dur_split.length == 2) {
-                            minutes = Number(dur_split[0])
-                            seconds = Number(dur_split[1])
+                        if (time_split.length == 2) {
+                            minutes = Number(time_split[0])
+                            seconds = Number(time_split[1])
 
-                        } else if (dur_split.length == 3) {
-                            hours = Number(dur_split[0])
-                            minutes = Number(dur_split[1])
-                            seconds = Number(dur_split[2])
+                        } else if (time_split.length == 3) {
+                            hours = Number(time_split[0])
+                            minutes = Number(time_split[1])
+                            seconds = Number(time_split[2])
 
-                        } else if (dur_split.length == 4) {
-                            days = Number(dur_split[0])
-                            hours = Number(dur_split[1])
-                            minutes = Number(dur_split[2])
-                            seconds = Number(dur_split[3])
+                        } else if (time_split.length == 4) {
+                            days = Number(time_split[0])
+                            hours = Number(time_split[1])
+                            minutes = Number(time_split[2])
+                            seconds = Number(time_split[3])
                         } else {
+                            console.log('Incorrectly formatted')
                             alert('Incorrectly formatted')
-                            return NaN
+                            return {}
                         }
 
-                        return luxon.Duration.fromObject({ days, hours, minutes, seconds })
+                        try {
+                            return luxon.Duration.fromObject({ days, hours, minutes, seconds })
+                        } catch (err) {
+                            console.log(err)
+                            alert(`err\n(Maybe select the other radio button?\nOr else incorrectly formatted...)`)
+                        }
+
                     }
 
                     function subtract_time_range(time_range) {
