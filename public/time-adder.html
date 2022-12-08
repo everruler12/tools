@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time Adder</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.7.14/dist/vue.js"></script>
+    <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.4/moment.min.js"></script> -->
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.1.1/build/global/luxon.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+</head>
+
+<body>
+    <section id="vm-app" class="section" v-cloak>
+
+        <h1 class="title">Time Adder</h1>
+
+        <div class="control">
+            <label class="radio">
+                <input type="radio" name="answer" v-model="time_type" value="time_lengths">
+                Time lengths
+            </label>
+            <label class="radio">
+                <input type="radio" name="answer" v-model="time_type" value="time_ranges">
+                Time ranges
+            </label>
+        </div>
+
+        <textarea class="textarea" v-model="times"></textarea>
+        <button class="button" @click="add()">Add</button>
+
+        <br><br>
+        Total: {{total_time}}
+
+
+    </section>
+
+
+    <script>
+
+
+        var vm = new Vue({
+            el: "#vm-app",
+            data: {
+                times: '',
+                time_type: 'time_lengths',
+                total_time: ''
+            },
+
+            computed: {
+                url() {
+                    return 'javascript:' + encodeURIComponent(this.createIIFE(this.code))
+                },
+            },
+
+            methods: {
+                add() {
+                    const times = this.times.trim().split('\n')
+                        .map(t => t.trim())
+                        .filter(t => !!t)
+
+                    function deconstructDurationToMs(dur) { // where duration is of the format 0:00 or 00:00 or 0:00:00
+                        const dur_split = dur.split(':')
+                        let ms
+
+                        if (dur_split.length == 2) {
+                            const min = Number(dur_split[0])
+                            const sec = Number(dur_split[1])
+                            const ms = (min * 60 + sec) * 1000
+                            return ms
+
+                        } else if (dur_split.length == 3) {
+                            const hr = Number(dur_split[0])
+                            const min = Number(dur_split[1])
+                            const sec = Number(dur_split[2])
+                            const ms = ((((hr * 60) + min) * 60) + sec) * 1000
+                            return ms
+
+                        } else if (dur_split.length == 4) {
+                            const day = Number(dur_split[0])
+                            const hr = Number(dur_split[1])
+                            const min = Number(dur_split[2])
+                            const sec = Number(dur_split[3])
+                            const ms = (((((day * 24) + hr * 60) + min) * 60) + sec) * 1000
+                            return ms
+                        }
+                    }
+
+                    function add_time_lengths(time_array) {
+                        // if (this.time_type == 'time_lengths')
+
+                        if (this.time_type == 'time_ranges') {
+                            time_array = time_array.map(subtract_time_range)
+                        }
+
+                        var total_sec = time_array.reduce((acc, time) => {
+
+                            const time_split = time.split(':')
+                            const min = Number(time_split[0])
+                            const sec = Number(time_split[1])
+
+                            return acc += min * 60 + sec
+
+                        }, 0)
+
+
+                        new_hr = Math.floor(total_sec / 3600)
+                        new_min = Math.floor((total_sec % 3600) / 60)
+                            .toString().padStart(2, '0')
+                        new_sec = (total_sec % 60)
+                            .toString().padStart(2, '0')
+                        return new_hr + ':' + new_min + ':' + new_sec
+                    }
+
+                    function convertColonsToMS(time_str) {
+                        time_str_split = time_str.split(':')
+                        if (time_str_split.length == 2) {
+
+                        }
+                    }
+
+                    function subtract_time_range(time_range) {
+                        const time_range_split = time_range.split('-')
+                        const start = time_range_split[0]
+                        const end = time_range_split[1]
+
+
+
+                        // subtract time range
+                        return moment(end_sec).subtract('seconds', start_sec)
+                    }
+
+                    // try catch and display if err
+                    this.total_time = add_time_lengths(times)
+                },
+
+
+
+
+
+                copy(text_to_copy) {
+                    function listener(e) {
+                        e.clipboardData.setData("text/plain", text_to_copy)
+                        e.preventDefault()
+                    }
+
+                    document.addEventListener("copy", listener)
+
+                    try {
+                        document.execCommand("copy")
+                        console.log("Copied:", text_to_copy)
+                    } catch (e) {
+                        console.log("Copy failed.", e)
+                    } finally {
+                        document.removeEventListener("copy", listener)
+                    }
+                }
+            },
+        })
+
+
+
+
+
+
+    </script>
+</body>
+
+</html>
