@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Microphone Playback</title>
+</head>
+
+<body>
+    <h1>Microphone Playback</h1>
+    <p>Listen to audio from a mic. Useful with Shazam extension or Chrome's Live Captions, by using a virtual audio cable to feed audio from a source outside of the browser.</p>
+    <button id="toggle">Start</button>
+
+    <script>
+        var audioContext;
+        var source;
+        var isPlaying = false;
+        var activeStream; // store the active MediaStream from the microphone
+
+        document.getElementById('toggle').addEventListener('click', function () {
+            if (isPlaying) {
+                // Disconnect the audio
+                source.disconnect(audioContext.destination);
+                audioContext.close();
+
+                // Stop the microphone stream
+                if (activeStream && activeStream.getTracks) {
+                    activeStream.getTracks().forEach(track => {
+                        track.stop();
+                    });
+                }
+
+                isPlaying = false;
+                this.textContent = 'Start';
+            } else {
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(function (stream) {
+                        activeStream = stream;
+                        audioContext = new AudioContext();
+                        source = audioContext.createMediaStreamSource(stream);
+                        source.connect(audioContext.destination);
+                        isPlaying = true;
+                        document.getElementById('toggle').textContent = 'Stop';
+                    })
+                    .catch(function (err) {
+                        console.log('An error occurred: ' + err);
+                    });
+            }
+        });
+    </script>
+</body>
+
+</html>
